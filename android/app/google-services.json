@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "343578154110",
+    "project_id": "concord-be354",
+    "storage_bucket": "concord-be354.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:343578154110:android:331f3124ad219b2757342f",
+        "android_client_info": {
+          "package_name": "com.concord.harmony.concord"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "343578154110-du69c20ef0fc3oupeudq754vfo0sfpp0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.concord.harmony.concord",
+            "certificate_hash": "a72abfce1cb3859737aeb9e31b515a94f3e264f8"
+          }
+        },
+        {
+          "client_id": "343578154110-k4ljka7273vrnbuhg8u68ecnuh1vc6rk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWXRCSq6RdIhQo3w49Jwcq6DRDtifzQJA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "343578154110-k4ljka7273vrnbuhg8u68ecnuh1vc6rk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
