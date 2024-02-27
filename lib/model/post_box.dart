@@ -209,60 +209,80 @@ class _PostBoxState extends State<PostBox> {
       ),
       //COMMENT TEXT BAR
       bottomNavigationBar: SafeArea(
-        child: Container(
-          height: kToolbarHeight,
-          margin: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          padding: EdgeInsets.only(left: 18, right: 18),
-          child: Row(
-            children: [
-              CircleAvatar(
-                backgroundImage: NetworkImage(
-                  user.photoURL!,
-                ),
-                radius: 18,
+        child: FutureBuilder<DocumentSnapshot>(
+          future: FirebaseFirestore.instance.collection('Users').doc(user.uid).get(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            }
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              return Text('User not found'); // handle if user not found
+            }
+
+            Map<String, dynamic> userData = snapshot.data!.data() as Map<String, dynamic>;
+            String username = userData['username'];
+            String photoURL = userData['photoURL'];
+            return Container(
+              height: kToolbarHeight,
+              margin: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 16.0, right: 8.0),
-                  child: TextField(
-                    controller: _commentController,
-                    decoration: InputDecoration(
-                      hintText: 'comment as ${user.displayName}',
-                      border: InputBorder.none,
+              padding: EdgeInsets.only(left: 18, right: 18),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(
+                      photoURL,
+                    ),
+                    radius: 18,
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 16.0, right: 8.0),
+                      child: TextField(
+                        controller: _commentController,
+                        decoration: InputDecoration(
+                          hintText: 'comment as ${username}',
+                          border: InputBorder.none,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  InkWell(
+                    onTap: () async {
+                      await FirestoreMethods().uploadComment(
+                        widget.snap['postId'],
+                        _commentController.text,
+                        user.uid,
+                        username,
+                        photoURL,
+                      );
+                      setState(() {
+                        _commentController.text = "";
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 8,
+                      ), // EdgeInsets.symmetric
+                      child: const Text(
+                        ' Post ',
+                        style: TextStyle(
+                          color: Colors.blue,
+                        ), // TextStyle
+                      ), // Text
+                    ), // Container
+                  ) // Inkwell
+                ],
               ),
-              InkWell(
-                onTap: () async {
-                  await FirestoreMethods().uploadComment(
-                    widget.snap['postId'],
-                    _commentController.text,
-                    user.uid,
-                    user.displayName,
-                    user.photoURL,
-                  );
-                  setState(() {
-                    _commentController.text = "";
-                  });
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 8,
-                  ), // EdgeInsets.symmetric
-                  child: const Text(
-                    ' Post ',
-                    style: TextStyle(
-                      color: Colors.blue,
-                    ), // TextStyle
-                  ), // Text
-                ), // Container
-              ) // Inkwell
-            ],
-          ),
+            );
+          }
         ),
       ),
     );

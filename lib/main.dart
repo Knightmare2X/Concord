@@ -1,12 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:concord/model/persist_nav_bar.dart';
-import 'package:concord/resources/auth.dart';
-import 'package:concord/screens/new_user_screens/create_desc_pic_screen.dart';
-import 'package:concord/screens/new_user_screens/create_profile_screen.dart';
-import 'package:concord/screens/new_user_screens/welcome.dart';
-import 'package:concord/screens/explore_screen.dart';
 import 'package:concord/screens/login_screen.dart';
-import 'package:concord/model/nav_bar.dart';
 import 'package:concord/utils/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -35,7 +29,10 @@ class _MyAppState extends State<MyApp> {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       // Check if it's the first time logging in
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection("Users").doc(user.uid).get();
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(user.uid)
+          .get();
 
       if (userDoc.exists) {
         // User exists in the database, navigate to PersistNavBar
@@ -54,7 +51,6 @@ class _MyAppState extends State<MyApp> {
       });
     }
   }
-
 
   LoginScreen currentpage = const LoginScreen();
 

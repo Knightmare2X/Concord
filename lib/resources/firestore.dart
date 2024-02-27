@@ -4,24 +4,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:concord/resources/comment.dart';
 import 'package:concord/resources/post.dart';
 import 'package:concord/resources/storage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 class FirestoreMethods {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   //upload post
-  Future<String> uploadPost(String description,
-      Uint8List file,
-      String uid,
-      displayName,
-      profImage,) async {
+  Future<String> uploadPost(
+    String description,
+    Uint8List file,
+    String uid,
+    displayName,
+    profImage,
+  ) async {
     String res = "Some error occured";
     try {
       String photoUrl =
-      await StorageMethods().uploadImageToStorage('Posts', file, true);
+          await StorageMethods().uploadImageToStorage('Posts', file, true);
 
       String postId = const Uuid().v1();
       Post post = Post(
@@ -37,8 +36,8 @@ class FirestoreMethods {
       );
 
       _firestore.collection('Posts').doc(postId).set(
-        post.toJson(),
-      );
+            post.toJson(),
+          );
 
       res = "success";
     } catch (err) {
@@ -51,17 +50,11 @@ class FirestoreMethods {
   Future<void> tLikePost(String postId, String uid, List likes) async {
     try {
       if (likes.contains(uid)) {
-        await _firestore
-            .collection('Posts')
-            .doc(postId)
-            .update({
+        await _firestore.collection('Posts').doc(postId).update({
           'likes': FieldValue.arrayRemove([uid]),
         });
       } else {
-        await _firestore
-            .collection('Posts')
-            .doc(postId)
-            .update({
+        await _firestore.collection('Posts').doc(postId).update({
           'likes': FieldValue.arrayUnion([uid]),
         });
       }
@@ -85,7 +78,6 @@ class FirestoreMethods {
     }
   }
 
-
   //post views length
 
   Future<void> viewPost(String postId, String uid, List views) async {
@@ -99,7 +91,7 @@ class FirestoreMethods {
 
         // Get the user ID of the post owner
         DocumentSnapshot postOwnerSnapshot =
-        await _firestore.collection('Posts').doc(postId).get();
+            await _firestore.collection('Posts').doc(postId).get();
 
         final postOwnerData = postOwnerSnapshot.data() as Map<String, dynamic>;
         String postOwnerId = postOwnerData['uid'] as String;
@@ -116,20 +108,17 @@ class FirestoreMethods {
     }
   }
 
-
-
-
-
   // Total views
-
 
   // upload comments
 
-  Future<String> uploadComment(String postId,
-      String text,
-      String uid,
-      displayName,
-      profImage,) async {
+  Future<String> uploadComment(
+    String postId,
+    String text,
+    String uid,
+    displayName,
+    profImage,
+  ) async {
     String res = "Some error occured";
     try {
       if (text.isNotEmpty) {
@@ -152,8 +141,8 @@ class FirestoreMethods {
             .collection('comments')
             .doc(commentId)
             .set(
-          comment.toJson(),
-        );
+              comment.toJson(),
+            );
       }
       res = "success";
     } catch (err) {
@@ -164,8 +153,8 @@ class FirestoreMethods {
 
   //liking comment
 
-  Future<void> likeComment(String commentId, String postId, String uid,
-      List likes) async {
+  Future<void> likeComment(
+      String commentId, String postId, String uid, List likes) async {
     try {
       if (likes.contains(uid)) {
         await _firestore
@@ -200,7 +189,6 @@ class FirestoreMethods {
   //
   //   }
   // }
-
 
 //Deleting Post
   Future<String> deletePost(String postId) async {
@@ -237,12 +225,10 @@ class FirestoreMethods {
 //     );
 //   }
 // }
-  Future<bool> followUser(String uid,
-      String followId) async {
+  Future<bool> followUser(String uid, String followId) async {
     try {
-      DocumentSnapshot snap = await _firestore.collection('Users')
-          .doc(uid)
-          .get();
+      DocumentSnapshot snap =
+          await _firestore.collection('Users').doc(uid).get();
       List following = (snap.data()! as dynamic)['following'];
 
       if (following.contains(followId)) {
@@ -253,8 +239,7 @@ class FirestoreMethods {
         await _firestore.collection('Users').doc(uid).update({
           'following': FieldValue.arrayRemove([followId])
         });
-
-      }else {
+      } else {
         await _firestore.collection('Users').doc(followId).update({
           'followers': FieldValue.arrayUnion([uid])
         });
@@ -262,7 +247,6 @@ class FirestoreMethods {
         await _firestore.collection('Users').doc(uid).update({
           'following': FieldValue.arrayUnion([followId])
         });
-
       }
       return true;
     } catch (e) {
@@ -271,18 +255,13 @@ class FirestoreMethods {
     return false;
   }
 
-
-
-
-
-
-
   Future<void> uploadFourPhotos(List<Uint8List> photoFiles, String uid) async {
     try {
       List<String> photoUrls = [];
 
       for (int i = 0; i < photoFiles.length; i++) {
-        String photoUrl = await StorageMethods().uploadImageToStorage('Users/$uid/DescPic', photoFiles[i], true);
+        String photoUrl = await StorageMethods()
+            .uploadImageToStorage('Users/$uid/DescPic', photoFiles[i], true);
         photoUrls.add(photoUrl);
       }
 
@@ -290,27 +269,22 @@ class FirestoreMethods {
       await _firestore.collection('Users').doc(uid).update({
         'descPic': photoUrls,
       });
-
     } catch (err) {
       print(err.toString());
     }
   }
 
-  Future<void> uploadData(username,String uid, Uint8List imageFile) async {
+  Future<void> uploadData(username, String uid, Uint8List imageFile) async {
     try {
-      String photoUrl = await StorageMethods().uploadImageToStorage('Users/$uid/ProfPic', imageFile, true);
+      String photoUrl = await StorageMethods()
+          .uploadImageToStorage('Users/$uid/ProfPic', imageFile, true);
 
       await _firestore.collection('Users').doc(uid).update({
         'username': username,
         'photoURL': photoUrl,
       });
-    }catch (e) {
+    } catch (e) {
       print(e.toString());
     }
   }
-
-
-
-
-
 }

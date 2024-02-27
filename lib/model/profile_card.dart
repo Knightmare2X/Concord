@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 class ProfileCard extends StatelessWidget {
   final String uid;
@@ -24,3 +25,4 @@ class ProfileCard extends StatelessWidget {
     );
   }
 }
+*/

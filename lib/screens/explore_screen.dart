@@ -1,8 +1,6 @@
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:concord/model/image_card.dart';
-import 'package:concord/model/nav_bar.dart';
-import 'package:concord/model/post_box.dart';
 import 'package:concord/resources/firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -33,13 +31,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
     });
   }
 
-  Future<void> postImage(String uid,  username,  profImage) async {
+  Future<void> postImage(String uid, username, profImage) async {
     setState(() {
       _isLoading = true;
     });
     try {
       // Retrieve user data from Firestore
-      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection('Users').doc(uid).get();
+      DocumentSnapshot userSnapshot =
+          await FirebaseFirestore.instance.collection('Users').doc(uid).get();
       if (userSnapshot.exists) {
         String username = userSnapshot['username'];
         String profImage = userSnapshot['photoURL'];
@@ -75,7 +74,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
     }
   }
 
-
   void clearImage() {
     setState(() {
       _file = null;
@@ -91,12 +89,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _file == null
-          ? _buildImageGridView()
-          : _buildImagePreview(),
+      body: _file == null ? _buildImageGridView() : _buildImagePreview(),
     );
   }
 
+  //place where you have all your feed
   Widget _buildImageGridView() {
     return Scaffold(
       body: ListView(
@@ -147,8 +144,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   shrinkWrap: true,
                   itemCount: docs.length,
                   physics: const ScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 30, horizontal: 10),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
                   crossAxisCount: 2,
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 8,
@@ -165,93 +162,118 @@ class _ExploreScreenState extends State<ExploreScreen> {
   }
 
   Widget _buildImagePreview() {
-    return Scaffold(
-      body: WillPopScope(
-        onWillPop: () async{
-          clearImage();
-          Navigator.of(context).pop();
-          return false;
-        } ,
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                _isLoading ? const LinearProgressIndicator() : Container(),
-                Container(),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16.0),
-                  child: Image.memory(
-                    _file!,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                SizedBox(height: 8.0,),
-                Column(
+  return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance.collection('Users').doc(user.uid).get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+        if (!snapshot.hasData || !snapshot.data!.exists) {
+          return Text('User not found'); // handle if user not found
+        }
+
+        Map<String, dynamic> userData = snapshot.data!.data() as Map<String, dynamic>;
+        String username = userData['username'];
+        String photoURL = userData['photoURL'];
+
+        return Scaffold(
+          body: WillPopScope(
+            onWillPop: () async {
+              clearImage();
+              Navigator.of(context).pop();
+              return false;
+            },
+            child: SafeArea(
+              child: SingleChildScrollView(
+                child: Column(
                   children: [
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16.0),
-                        child: Container(
-                          color: Colors.white24,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              DateFormat('dd MMMM yyyy')
-                                  .format(DateTime.now()),
-                              textAlign: TextAlign.end,
+                    _isLoading ? LinearProgressIndicator() : Container(),
+                    Container(),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16.0),
+                      child: Image.memory(
+                        _file!,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 8.0,
+                    ),
+                    Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16.0),
+                            child: Container(
+                              color: Colors.white24,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  DateFormat('dd MMMM yyyy').format(DateTime.now()),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      backgroundImage: NetworkImage(user.photoURL!),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          backgroundImage: NetworkImage(photoURL),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          child: TextField(
+                            controller: _descriptionController,
+                            decoration: InputDecoration(
+                              hintText: 'Write a caption...',
+                              border: InputBorder.none,
+                            ),
+                            maxLines: 4,
+                          ),
+                        ),
+                        // OutlinedButton
+                      ],
+                    ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: OutlinedButton(
+                        onPressed: () {
+                          // This is what you should add in your code
+                          if (_isClicked) {
+                            _isClicked = false;
+                            postImage(user.uid, username, photoURL);
+                          }
+                        },
+                        child: Text('Post'),
+                        style: OutlinedButton.styleFrom(
+                          primary: Colors.blueAccent,
+                          side: BorderSide(color: Colors.lightBlue),
+                        ),
+                      ),
                     ),
                     SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: TextField(
-                        controller: _descriptionController,
-                        decoration: InputDecoration(
-                          hintText: 'Write a caption...',
-                          border: InputBorder.none,
-                        ),
-                        maxLines: 4,
-                      ),
-                    ),
-                    // OutlinedButton
+                      height: 20,
+                    )
                   ],
                 ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      // This is what you should add in your code
-                      if(_isClicked){
-                        _isClicked=false;
-                        postImage(user.uid, user.displayName, user.photoURL);
-                      }
-                    },
-                    child: Text('Post'),
-                    style: OutlinedButton.styleFrom(
-                      primary: Colors.blueAccent,
-                      side: BorderSide(color: Colors.lightBlue),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20,)
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
+
 }

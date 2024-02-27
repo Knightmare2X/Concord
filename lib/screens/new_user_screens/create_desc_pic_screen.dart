@@ -31,13 +31,18 @@ class _CreateDescPicScreen extends State<CreateDescPicScreen> {
         backgroundColor: Colors.black,
         title: Text(
           "Create Description Pic",
-          style: TextStyle(fontFamily: "Pacifico",fontSize: 30,decoration: TextDecoration.underline),
+          style: TextStyle(
+              fontFamily: "Pacifico",
+              fontSize: 30,
+              decoration: TextDecoration.underline),
         ),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => CreateProfileScreen()));
-
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => CreateProfileScreen()));
             },
             child: Opacity(
               opacity: 0.2,
@@ -50,7 +55,6 @@ class _CreateDescPicScreen extends State<CreateDescPicScreen> {
               ),
             ),
           ),
-
         ],
       ),
       body: SafeArea(
@@ -63,14 +67,15 @@ class _CreateDescPicScreen extends State<CreateDescPicScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Text(
                   "Tell us something about yourself in 4 pics",
-                  style: TextStyle(fontSize: 35,fontFamily: 'Josefin'),
+                  style: TextStyle(fontSize: 35, fontFamily: 'Josefin'),
                   textAlign: TextAlign.start,
                 ),
               ),
               Expanded(
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
+                    padding: const EdgeInsets.only(
+                        left: 16, right: 16, top: 8, bottom: 8),
                     child: GridView.builder(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
@@ -86,7 +91,8 @@ class _CreateDescPicScreen extends State<CreateDescPicScreen> {
 
                         return GestureDetector(
                           onTap: () async {
-                            final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                            final pickedFile = await ImagePicker()
+                                .pickImage(source: ImageSource.gallery);
 
                             if (pickedFile != null) {
                               // Update the placeholder list with the selected image path
@@ -137,7 +143,8 @@ class _CreateDescPicScreen extends State<CreateDescPicScreen> {
 
                       if (selectedImages.length == 4) {
                         final User user = FirebaseAuth.instance.currentUser!;
-                        await FirestoreMethods().uploadFourPhotos(selectedImages, user.uid);
+                        await FirestoreMethods()
+                            .uploadFourPhotos(selectedImages, user.uid);
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -158,28 +165,33 @@ class _CreateDescPicScreen extends State<CreateDescPicScreen> {
                       print("Error uploading images: $error");
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text("An error occurred while uploading images."),
+                          content:
+                              Text("An error occurred while uploading images."),
                           duration: Duration(seconds: 2),
                         ),
                       );
                     }
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => CreateProfileScreen())
-                    );
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CreateProfileScreen()));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.lightBlue.shade200,
                   ),
                   child: Text(
                     "Continue",
-                    style: TextStyle(fontSize: 21, color: Colors.white70, fontFamily: 'Josefin', fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 21,
+                        color: Colors.white70,
+                        fontFamily: 'Josefin',
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
-
-
-
-
-              SizedBox(height: 40,)
+              SizedBox(
+                height: 40,
+              )
             ],
           ),
         ),
