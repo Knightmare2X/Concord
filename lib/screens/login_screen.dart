@@ -95,16 +95,21 @@ class _LoginScreenState extends State<LoginScreen> {
             //google signin
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Colors.white,
+                backgroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(34)),
                 ),
               ),
-              onPressed: () {
-                signUp(
-                  context,
-                );
+              onPressed: () async {
+                try {
+                  // Call signUp function and pass the BuildContext
+                  await signUp(context);
+                } catch (e) {
+                  // Handle any errors that might occur during sign-up
+                  print("Error during sign-up: $e");
+                  // Display a snackbar or any other appropriate error handling mechanism
+                }
               },
               child: Row(
                 children: [
