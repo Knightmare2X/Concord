@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:concord/model/persist_nav_bar.dart';
 import 'package:concord/screens/new_user_screens/create_desc_pic_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,57 +12,47 @@ final GoogleSignIn _googleSignIn = GoogleSignIn();
 
 Future<void> signUp(BuildContext context) async {
   try {
-    // Trigger the authentication flow
-    GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signInSilently();
-
+    // Sign in with Google
+    GoogleSignInAccount? googleSignInAccount =
+        await _googleSignIn.signInSilently();
     if (googleSignInAccount == null) {
       // If there are no previously authenticated accounts, initiate sign-in
       googleSignInAccount = await _googleSignIn.signIn();
     }
     if (googleSignInAccount != null) {
-      GoogleSignInAuthentication googleAuth = await googleSignInAccount
-          .authentication;
+      GoogleSignInAuthentication googleAuth =
+          await googleSignInAccount.authentication;
       AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      final UserCredential authResult =
-      await _auth.signInWithCredential(credential);
+      UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
+      User? user = userCredential.user;
 
-      final User? user = authResult.user;
+      if (user != null) {
+        // Check if the user document exists in Firestore
+        DocumentSnapshot userDoc =
+            await _firestore.collection('Users').doc(user.uid).get();
 
-      //Here to check isNewUser OR Not
-      if (authResult.additionalUserInfo!.isNewUser) {
-        if (user != null) {
-          // Check if the user document exists in Firestore
-          DocumentSnapshot userDoc =
-          await _firestore.collection('Users').doc(user.uid).get();
-
-          if (!userDoc.exists) {
-            // If user document doesn't exist, create it
-            await _firestore.collection('Users').doc(user.uid).set({
-              'username': user.displayName,
-              'email': user.email,
-              'photoURL': user.photoURL,
-              'uid': user.uid,
-              'followers': [],
-              'following': [],
-              'totalViews': 0,
-              'creationDate': DateTime.now(),
-            });
-          }
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => CreateDescPicScreen()));
+        if (!userDoc.exists) {
+          // If user document doesn't exist, create it
+          await _firestore.collection('Users').doc(user.uid).set({
+            'username': user.displayName,
+            'email': user.email,
+            'photoURL': user.photoURL,
+            'uid': user.uid,
+            'followers': [],
+            'following': [],
+            'totalViews': 0,
+            'creationDate': DateTime.now(),
+          });
         }
-      } else {
         Navigator.push(context,
-            MaterialPageRoute(builder: (context) => PersistNavBar()));
-        //Ex: Go to HomePage()
+            MaterialPageRoute(builder: (context) => CreateDescPicScreen()));
       }
     }
-
-
-  }catch (error) {
+  } catch (error) {
     print(error);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -72,12 +61,6 @@ Future<void> signUp(BuildContext context) async {
     );
   }
 }
-
-
-
-
-
-
 
 Future<void> signOut(BuildContext context) async {
   try {

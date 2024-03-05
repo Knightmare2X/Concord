@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:concord/resources/auth.dart';
 import 'package:concord/resources/firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,7 +6,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
-
 import '../model/follow_button.dart';
 import '../model/image_card.dart';
 import '../utils/utils.dart';
@@ -30,12 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int following = 0;
   bool isFollowing = false;
   bool isLoading = false;
-  List<String> descPics = [
-    "assets/placeholders/placeholder1.png",
-    "assets/placeholders/placeholder2.png",
-    "assets/placeholders/placeholder3.png",
-    "assets/placeholders/placeholder4.png",
-  ];
+  List<String> descPics = [];
 
   @override
   void initState() {
@@ -221,7 +214,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     tag: imageUrl,
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(16),
-                                      child: getImageWidget(imageUrl),
+                                      child: Image.network(
+                                        imageUrl,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
                                   ),
                                 );
@@ -420,34 +416,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           );
   }
-
-  getImageWidget(String imageUrl) {
-    if (imageUrl.startsWith("assets")) {
-      return CachedNetworkImage(
-        imageUrl: imageUrl,
-        fit: BoxFit.cover,
-        placeholder: (context, url) => Opacity(
-          opacity: 0.5,
-          child: Image.asset(
-            imageUrl,
-            fit: BoxFit.fill,
-          ),
-        ),
-        errorWidget: (context, url, error) => Opacity(
-          opacity: 0.5,
-          child: Image.asset(
-            imageUrl,
-            fit: BoxFit.fill,
-          ),
-        ),
-      );
-    } else {
-      return Image.network(
-        imageUrl,
-        fit: BoxFit.cover,
-      );
-    }
-  }
 }
 
 Widget _buildStat(BuildContext context, String label, String value) {
@@ -478,7 +446,6 @@ Widget _buildStat(BuildContext context, String label, String value) {
 class FullScreenImage extends StatelessWidget {
   final String imageUrl;
 
-
   const FullScreenImage({required this.imageUrl});
 
   @override
@@ -495,40 +462,15 @@ class FullScreenImage extends StatelessWidget {
               tag: imageUrl,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child:getImageWidget(imageUrl),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),
         ),
       ),
     );
-  }
-
-  getImageWidget(String imageUrl){
-    if (imageUrl.startsWith("assets")) {
-      return CachedNetworkImage(
-        imageUrl: imageUrl,
-        fit: BoxFit.cover,
-        placeholder: (context, url) => Opacity(
-          opacity: 0.5,
-          child: Image.asset(
-            imageUrl,
-            fit: BoxFit.fill,
-          ),
-        ),
-        errorWidget: (context, url, error) => Opacity(
-          opacity: 0.5,
-          child: Image.asset(
-            imageUrl,
-            fit: BoxFit.fill,
-          ),
-        ),
-      );
-    } else {
-      return Image.network(
-        imageUrl,
-        fit: BoxFit.cover,
-      );
-    }
   }
 }

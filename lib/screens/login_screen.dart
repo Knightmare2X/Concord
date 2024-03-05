@@ -101,15 +101,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.all(Radius.circular(34)),
                 ),
               ),
-              onPressed: () async {
-                try {
-                  // Call signUp function and pass the BuildContext
-                  await signUp(context);
-                } catch (e) {
-                  // Handle any errors that might occur during sign-up
-                  print("Error during sign-up: $e");
-                  // Display a snackbar or any other appropriate error handling mechanism
-                }
+              onPressed: () {
+                signUp(
+                  context,
+                );
               },
               child: Row(
                 children: [
