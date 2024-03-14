@@ -4,7 +4,6 @@ import 'package:concord/model/persist_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
 import '../../resources/firestore.dart';
 
 class CreateProfileScreen extends StatefulWidget {
@@ -69,14 +68,17 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         radius: 90,
                         child: selectedImageBytes != null
                             ? null
-                            : Icon(Icons.person,
-                            size: 80,
-                            color: Colors
-                                .white), // Show icon only if image is not loaded
+                            : Image.asset(
+                          'assets/icons/user.png',
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                        ),
                         backgroundImage: selectedImageBytes != null
                             ? MemoryImage(selectedImageBytes!)
                             : null,
                       ),
+
                       if (selectedImageBytes == null &&
                           selectedImagePath !=
                               null) // Show loading indicator if image is being loaded
@@ -94,8 +96,9 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                   ),
                   child: TextField(
                     onChanged: (value) {
+                      final modifiedValue = value.replaceAll(' ', '_');
                       setState(() {
-                        username = value.trim();
+                        username = modifiedValue;
                         showUsernameError = false;
                       });
                     },
@@ -104,7 +107,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                       hintText: 'Username',
                       counterText: '',
                       errorText:
-                      showUsernameError ? 'Username cannot be empty' : null,
+                      showUsernameError ? 'Invalid username' : null,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -115,15 +118,15 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                   padding: const EdgeInsets.all(16),
                   child: ElevatedButton(
                     onPressed: () async {
-                      if (username.isEmpty) {
+                      if (username.isEmpty || !isValidUsername(username)) {
                         setState(() {
                           showUsernameError = true;
                         });
                         return;
                       }
 
+                      // Your remaining code here
                       bool isUnique = await _checkUniqueUsername(username);
-
                       if (!isUnique) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -137,7 +140,10 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                       try {
                         final User user = FirebaseAuth.instance.currentUser!;
                         await FirestoreMethods().uploadData(
-                            username, user.uid, selectedImageBytes!);
+                          username,
+                          user.uid,
+                          selectedImageBytes!,
+                        );
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text("Welcome"),
@@ -145,9 +151,11 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                           ),
                         );
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => PersistNavBar()));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PersistNavBar(),
+                          ),
+                        );
                       } catch (e) {
                         print("Error: $e");
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -164,10 +172,11 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     child: Text(
                       "Done",
                       style: TextStyle(
-                          fontSize: 21,
-                          color: Colors.white70,
-                          fontFamily: 'Josefin',
-                          fontWeight: FontWeight.bold),
+                        fontSize: 21,
+                        color: Colors.white70,
+                        fontFamily: 'Josefin',
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -178,4 +187,9 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
       ),
     );
   }
+
+  bool isValidUsername(String username) {
+    return RegExp(r'^[a-zA-Z0-9_.]+$').hasMatch(username);
+  }
+
 }

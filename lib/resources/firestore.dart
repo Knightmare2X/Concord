@@ -287,4 +287,24 @@ class FirestoreMethods {
       print(e.toString());
     }
   }
+
+
+  Future<bool> isUsernameUnique(String username) async {
+    try {
+      // Query Firestore to check if the username already exists
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Users')
+          .where('username', isEqualTo: username)
+          .get();
+
+      // If no documents match the query, the username is unique
+      return querySnapshot.docs.isEmpty;
+    } catch (e) {
+      // Handle any errors
+      print("Error checking username uniqueness: $e");
+      return false; // Assume username is not unique in case of an error
+    }
+  }
+
+
+
 }
