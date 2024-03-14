@@ -25,12 +25,11 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
 
     if (pickedFile != null) {
       final Uint8List? bytes = await pickedFile.readAsBytes();
-     if (bytes != null) {
-       setState(() {
-         selectedImageBytes = bytes;
-       });
-     }
-
+      if (bytes != null) {
+        setState(() {
+          selectedImageBytes = bytes;
+        });
+      }
     }
   }
 
@@ -69,16 +68,15 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         child: selectedImageBytes != null
                             ? null
                             : Image.asset(
-                          'assets/icons/user.png',
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                        ),
+                                'assets/icons/user.png',
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.cover,
+                              ),
                         backgroundImage: selectedImageBytes != null
                             ? MemoryImage(selectedImageBytes!)
                             : null,
                       ),
-
                       if (selectedImageBytes == null &&
                           selectedImagePath !=
                               null) // Show loading indicator if image is being loaded
@@ -106,13 +104,23 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     decoration: InputDecoration(
                       hintText: 'Username',
                       counterText: '',
-                      errorText:
-                      showUsernameError ? 'Invalid username' : null,
+                      errorText: showUsernameError ? 'Invalid username' : null,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 5),
+                Container(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Username should only have numbers, letter, underscores and fullstop",
+                      style: TextStyle(color: Colors.grey),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 5),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
@@ -139,11 +147,19 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
 
                       try {
                         final User user = FirebaseAuth.instance.currentUser!;
-                        await FirestoreMethods().uploadData(
-                          username,
-                          user.uid,
-                          selectedImageBytes!,
-                        );
+                        if (selectedImageBytes != null) {
+                          await FirestoreMethods().uploadData(
+                            username,
+                            user.uid,
+                            selectedImageBytes!,
+                          );
+                        } else {
+                          await FirestoreMethods().uploadDataWithoutImage(
+                            username,
+                            user.uid,
+                          );
+                        }
+
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text("Welcome"),
@@ -165,6 +181,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                           ),
                         );
                       }
+
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.lightBlue.shade200,
@@ -191,5 +208,4 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   bool isValidUsername(String username) {
     return RegExp(r'^[a-zA-Z0-9_.]+$').hasMatch(username);
   }
-
 }

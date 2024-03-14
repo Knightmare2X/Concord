@@ -40,7 +40,6 @@ Future<void> signUp(BuildContext context) async {
           await _firestore.collection('Users').doc(user.uid).set({
             'username': user.displayName,
             'email': user.email,
-            'photoURL': user.photoURL,
             'uid': user.uid,
             'followers': [],
             'following': [],

@@ -37,6 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     "assets/placeholders/placeholder4.png",
   ];
 
+
   @override
   void initState() {
     super.initState();
@@ -242,32 +243,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 children: <Widget>[
                                   GestureDetector(
                                     onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => FullScreenImage(
-                                              imageUrl: userData['photoURL']),
-                                        ),
-                                      );
+                                      if (userData['photoURL'] != null && userData['photoURL'].isNotEmpty) {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => FullScreenImage(
+                                              imageUrl: userData['photoURL'],
+                                            ),
+                                          ),
+                                        );
+                                      }
                                     },
                                     child: Hero(
                                       tag: "profile_avatar",
                                       child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.2,
-                                        // Adjust the multiplier as needed
-                                        height:
-                                            MediaQuery.of(context).size.width *
-                                                0.2,
-                                        // You can use size.height for different orientation
-                                        child: CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                              userData['photoURL']),
+                                        width: MediaQuery.of(context).size.width * 0.2,
+                                        height: MediaQuery.of(context).size.width * 0.2,
+                                        child: userData['photoURL'] != null && userData['photoURL'].isNotEmpty
+                                            ? CircleAvatar(
+                                          backgroundImage: NetworkImage(userData['photoURL']),
+                                        )
+                                            : Icon(
+                                          Icons.account_circle,
+                                          size: MediaQuery.of(context).size.width * 0.2, // Adjust size as needed
                                         ),
                                       ),
                                     ),
                                   ),
+
                                   SizedBox(
                                       width: MediaQuery.of(context).size.width *
                                           0.01),

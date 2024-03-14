@@ -288,6 +288,17 @@ class FirestoreMethods {
     }
   }
 
+  Future<void> uploadDataWithoutImage(String username, String uid) async {
+    try {
+      await _firestore.collection('Users').doc(uid).update({'username': username});
+    } catch (e) {
+      print(e.toString());
+      throw e;
+    }
+  }
+
+
+
 
   Future<bool> isUsernameUnique(String username) async {
     try {
