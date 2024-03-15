@@ -24,6 +24,8 @@ class _CreateDescPicScreen extends State<CreateDescPicScreen> {
     "assets/placeholders/placeholder4.png",
   ];
 
+  bool _loading = false; // Track loading state
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,6 +64,7 @@ class _CreateDescPicScreen extends State<CreateDescPicScreen> {
           color: Colors.black87,
           child: Column(
             children: [
+              if (_loading) LinearProgressIndicator(), // Add progress bar
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -136,6 +139,10 @@ class _CreateDescPicScreen extends State<CreateDescPicScreen> {
                 child: ElevatedButton(
                   onPressed: () async {
                     try {
+                      setState(() {
+                        _loading = true; // Set loading state to true
+                      });
+
                       List<Uint8List> selectedImages = placeholder
                           .where((path) => !path.startsWith("assets"))
                           .map((path) => File(path).readAsBytesSync())
@@ -166,11 +173,16 @@ class _CreateDescPicScreen extends State<CreateDescPicScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content:
-                              Text("An error occurred while uploading images."),
+                          Text("An error occurred while uploading images."),
                           duration: Duration(seconds: 2),
                         ),
                       );
+                    } finally {
+                      setState(() {
+                        _loading = false; // Reset loading state on completion
+                      });
                     }
+
                     Navigator.push(
                         context,
                         MaterialPageRoute(
