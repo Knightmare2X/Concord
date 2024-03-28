@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:concord/model/persist_nav_bar.dart';
 import 'package:concord/screens/login_screen.dart';
+import 'package:concord/screens/new_user_screens/create_account.dart';
 import 'package:concord/utils/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -15,7 +16,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late Widget currentPage;
+  late Widget currentPage = CreateAccountPage();
   //const LoginScreen();
 
   @override
@@ -76,3 +77,5 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(
       systemNavigationBarColor: Colors.black)); //delete for light mode
 }
+
+

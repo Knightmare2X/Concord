@@ -9,6 +9,6 @@ class CreateAccountPage extends StatefulWidget {
 class _CreateAccountPageState extends State<CreateAccountPage> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Center(child: const CircularProgressIndicator());
   }
 }

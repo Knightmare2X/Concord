@@ -24,6 +24,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   bool _isLoading = false;
   bool _isClicked = true;
 
+
   Future<void> imagePick() async {
     Uint8List file = await pickImage(ImageSource.gallery);
     setState(() {
@@ -73,6 +74,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
       showSnackBar(context, e.toString());
     }
   }
+
+
 
   void clearImage() {
     setState(() {
@@ -138,24 +141,57 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   child: CircularProgressIndicator(),
                 );
               }
-              final List<QueryDocumentSnapshot> docs = snapshot.data!.docs;
               return Expanded(
-                child: MasonryGridView.count(
-                  shrinkWrap: true,
-                  itemCount: docs.length,
-                  physics: const ScrollPhysics(),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                  itemBuilder: (context, index) => ImageCard(
-                    snap: docs[index].data(),
-                  ),
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('Posts')
+                      .orderBy('datePublished', descending: true)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    final List<QueryDocumentSnapshot> docs = snapshot.data!.docs;
+                    return Expanded(
+                      child: StreamBuilder<DocumentSnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('Users')
+                            .doc(user.uid) // Assuming currentUserUid is the UID of the current user
+                            .snapshots(),
+                        builder: (context, userSnapshot) {
+                          if (userSnapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          final List<dynamic> following = userSnapshot.data!['following'];
+                          final filteredDocs = docs.where((doc) =>
+                          following.contains(doc['uid']) || doc['uid'] == user.uid
+                          ).toList();
+                          return MasonryGridView.count(
+                            shrinkWrap: true,
+                            itemCount: filteredDocs.length,
+                            physics: const ScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 8,
+                            crossAxisSpacing: 8,
+                            itemBuilder: (context, index) => ImageCard(
+                              snap: filteredDocs[index].data(),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
                 ),
+
               );
             },
           ),
+
         ],
       ),
     );
@@ -258,8 +294,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         },
                         child: Text('Post'),
                         style: OutlinedButton.styleFrom(
-                          primary: Colors.blueAccent,
-                          side: BorderSide(color: Colors.lightBlue),
+                          foregroundColor: Colors.blueAccent, side: BorderSide(color: Colors.lightBlue),
                         ),
                       ),
                     ),
