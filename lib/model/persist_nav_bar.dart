@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,6 +19,13 @@ class _PersistNavBarState extends State<PersistNavBar> {
   PersistentTabController controller = PersistentTabController(initialIndex: 0);
   ScrollController scrollController = ScrollController();
   bool hideNavBar = false;
+
+  Future<String> getUserPhotoURL() async {
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+    DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+    await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+    return userSnapshot.data()?['photoURL'] ?? '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,13 +82,33 @@ class _PersistNavBarState extends State<PersistNavBar> {
                 activeColorPrimary: Theme.of(context).primaryColor,
                 inactiveColorPrimary: Colors.grey),
             PersistentBottomNavBarItem(
-                icon: Icon(
-                  Icons.account_circle,
-                  size: 30,
-                ),
-                title: 'profile',
-                activeColorPrimary: Theme.of(context).primaryColor,
-                inactiveColorPrimary: Colors.grey),
+              icon: FutureBuilder<String>(
+                future: getUserPhotoURL(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // Return a loading indicator while fetching the URL
+                    return CircularProgressIndicator();
+                  } else {
+                    if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                      // Return the user's photo if available
+                      return CircleAvatar(
+                        backgroundImage: NetworkImage(snapshot.data!),
+                        radius: 15,
+                      );
+                    } else {
+                      // Return the default account circle icon if user photo is not available
+                      return Icon(
+                        Icons.account_circle,
+                        size: 30,
+                      );
+                    }
+                  }
+                },
+              ),
+              title: 'profile',
+              activeColorPrimary: Theme.of(context).primaryColor,
+              inactiveColorPrimary: Colors.grey,
+            ),
           ],
           backgroundColor:
               MediaQuery.of(context).platformBrightness == Brightness.dark
