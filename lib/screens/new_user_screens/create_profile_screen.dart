@@ -5,6 +5,7 @@ import 'package:concord/model/persist_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
 import '../../resources/firestore.dart';
 
 class CreateProfileScreen extends StatefulWidget {
@@ -26,12 +27,10 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      final Uint8List? bytes = await pickedFile.readAsBytes();
-      if (bytes != null) {
-        setState(() {
-          selectedImageBytes = bytes;
-        });
-      }
+      final Uint8List bytes = await pickedFile.readAsBytes();
+      setState(() {
+        selectedImageBytes = bytes;
+      });
     }
   }
 
@@ -45,7 +44,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.black,
-          title: Text(
+          title: const Text(
             "Almost Done",
             style: TextStyle(
                 fontFamily: "Pacifico",
@@ -57,8 +56,8 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              if (_loading) LinearProgressIndicator(), // Add progress bar
-              SizedBox(height: 40),
+              if (_loading) const LinearProgressIndicator(), // Add progress bar
+              const SizedBox(height: 40),
               InkWell(
                 onTap: _pickImage,
                 child: Stack(
@@ -67,32 +66,32 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     CircleAvatar(
                       backgroundColor: Colors.grey,
                       radius: 90,
-                      child: selectedImageBytes != null
-                          ? null
-                          : Image.asset(
-                        'assets/icons/user.png',
-                        width: 80,
-                        height: 80,
-                        fit: BoxFit.cover,
-                      ),
                       backgroundImage: selectedImageBytes != null
                           ? MemoryImage(selectedImageBytes!)
                           : null,
+                      child: selectedImageBytes != null
+                          ? null
+                          : Image.asset(
+                              'assets/icons/user.png',
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.cover,
+                            ),
                     ),
                     if (selectedImageBytes == null &&
                         selectedImagePath !=
                             null) // Show loading indicator if image is being loaded
-                      CircularProgressIndicator(),
+                      const CircularProgressIndicator(),
                   ],
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Container(
-                padding: EdgeInsets.all(4.0),
+                padding: const EdgeInsets.all(4.0),
                 decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
                   border: Border.all(color: Colors.grey, width: 2.0),
-                  borderRadius: BorderRadius.all(Radius.circular(11)),
+                  borderRadius: const BorderRadius.all(Radius.circular(11)),
                 ),
                 child: TextField(
                   onChanged: (value) {
@@ -105,24 +104,21 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                   decoration: InputDecoration(
                     hintText: 'Username',
                     counterText: '',
-                    errorText:
-                    showUsernameError ? 'Invalid username' : null,
+                    errorText: showUsernameError ? 'Invalid username' : null,
                   ),
                   textAlign: TextAlign.center,
                 ),
               ),
-              SizedBox(height: 5),
-              Container(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Username should only have numbers, letter, underscores and fullstop",
-                    style: TextStyle(color: Colors.grey),
-                    textAlign: TextAlign.center,
-                  ),
+              const SizedBox(height: 5),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  "Username should only have numbers, letter, underscores and fullstop",
+                  style: TextStyle(color: Colors.grey),
+                  textAlign: TextAlign.center,
                 ),
               ),
-              SizedBox(height: 5),
+              const SizedBox(height: 5),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
@@ -145,12 +141,14 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                       setState(() {
                         _loading = false; // Reset loading state
                       });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Username already exists."),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Username already exists."),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
                       return;
                     }
 
@@ -169,26 +167,32 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         );
                       }
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Welcome"),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PersistNavBar(),
-                        ),
-                      );
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Welcome"),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                      if (context.mounted) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PersistNavBar(),
+                          ),
+                        );
+                      }
                     } catch (e) {
                       print("Error: $e");
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("An error occurred."),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("An error occurred."),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
                     } finally {
                       setState(() {
                         _loading = false; // Reset loading state on completion
@@ -198,7 +202,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.lightBlue.shade200,
                   ),
-                  child: Text(
+                  child: const Text(
                     "Done",
                     style: TextStyle(
                       fontSize: 21,

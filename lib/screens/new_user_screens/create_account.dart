@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({Key? key}) : super(key: key);
 
@@ -9,6 +10,6 @@ class CreateAccountPage extends StatefulWidget {
 class _CreateAccountPageState extends State<CreateAccountPage> {
   @override
   Widget build(BuildContext context) {
-    return Center(child: const CircularProgressIndicator());
+    return const Center(child: CircularProgressIndicator());
   }
 }

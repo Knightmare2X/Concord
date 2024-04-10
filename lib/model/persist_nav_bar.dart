@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:concord/screens/music_screen/song_screen.dart';
+import 'package:concord/screens/notifications_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
-import '../screens/explore_screen.dart';
-import '../screens/music_screen.dart';
+
+import '../screens/explore_screen/explore_screen.dart';
 import '../screens/profile_screen.dart';
-import '../screens/search_screen.dart';
+import '../screens/search_screen/search_screen.dart';
 
 class PersistNavBar extends StatefulWidget {
   const PersistNavBar({Key? key}) : super(key: key);
@@ -23,7 +24,7 @@ class _PersistNavBarState extends State<PersistNavBar> {
   Future<String> getUserPhotoURL() async {
     String userId = FirebaseAuth.instance.currentUser!.uid;
     DocumentSnapshot<Map<String, dynamic>> userSnapshot =
-    await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+        await FirebaseFirestore.instance.collection('Users').doc(userId).get();
     return userSnapshot.data()?['photoURL'] ?? '';
   }
 
@@ -41,16 +42,16 @@ class _PersistNavBarState extends State<PersistNavBar> {
           hideNavigationBar: hideNavBar,
           screens: [
             const ExploreScreen(),
-            const MusicScreen(),
             const SearchScreen(),
-            Container(color: Colors.blue),
+            const SongScreen(),
+            const NotificationsScreen(),
             ProfileScreen(
               uid: FirebaseAuth.instance.currentUser!.uid,
             ),
           ],
           items: <PersistentBottomNavBarItem>[
             PersistentBottomNavBarItem(
-                icon: Icon(
+                icon: const Icon(
                   Icons.image,
                   size: 30,
                 ),
@@ -58,7 +59,16 @@ class _PersistNavBarState extends State<PersistNavBar> {
                 activeColorPrimary: Theme.of(context).primaryColor,
                 inactiveColorPrimary: Colors.grey),
             PersistentBottomNavBarItem(
-                icon: Icon(
+                icon: const Icon(
+                  Icons.search,
+                  size: 30,
+                ),
+                title: 'search',
+                activeColorPrimary: Theme.of(context).primaryColor,
+                inactiveColorPrimary: Colors.grey),
+
+            PersistentBottomNavBarItem(
+                icon: const Icon(
                   Icons.music_note,
                   size: 30,
                 ),
@@ -66,15 +76,7 @@ class _PersistNavBarState extends State<PersistNavBar> {
                 activeColorPrimary: Theme.of(context).primaryColor,
                 inactiveColorPrimary: Colors.grey),
             PersistentBottomNavBarItem(
-                icon: Icon(
-                  Icons.search,
-                  size: 30,
-                ),
-                title: 'search',
-                activeColorPrimary: Theme.of(context).primaryColor,
-                inactiveColorPrimary: Colors.grey),
-            PersistentBottomNavBarItem(
-                icon: Icon(
+                icon: const Icon(
                   Icons.notifications,
                   size: 30,
                 ),
@@ -87,7 +89,7 @@ class _PersistNavBarState extends State<PersistNavBar> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     // Return a loading indicator while fetching the URL
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   } else {
                     if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                       // Return the user's photo if available
@@ -97,7 +99,7 @@ class _PersistNavBarState extends State<PersistNavBar> {
                       );
                     } else {
                       // Return the default account circle icon if user photo is not available
-                      return Icon(
+                      return const Icon(
                         Icons.account_circle,
                         size: 30,
                       );

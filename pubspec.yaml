@@ -33,6 +33,7 @@ dependencies:
   form_field_validator: ^1.1.0
   persistent_bottom_nav_bar: ^5.0.2
   image_painter: ^0.6.1
+  audioplayers: ^5.2.1
 
 
 dev_dependencies:
@@ -57,6 +58,8 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/placeholders/
+    - assets/albumart/
+    - assets/audio/
   fonts:
     - family: Pacifico
       fonts:

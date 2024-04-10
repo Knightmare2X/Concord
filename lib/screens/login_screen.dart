@@ -6,7 +6,7 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -38,14 +38,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Colors.lightBlue.shade200, // Border color
                   width: 3.0, // Border width
                 ),
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20.0), // Top-left corner radius
                   topRight: Radius.circular(20.0), // Top-right corner radius
                 ),
               ),
               child: ShaderMask(
-                blendMode:
-                    BlendMode.srcATop, // Blend the gradient with the image
+                blendMode: BlendMode.srcATop,
+                // Blend the gradient with the image
                 shaderCallback: (Rect bounds) {
                   return LinearGradient(
                     begin: Alignment.center, // Start the gradient at the top
@@ -56,11 +56,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       Colors
                           .lightBlue.shade200, // Background color at the bottom
                     ],
-                    stops: [0.0, 20], // Adjust the stop values as needed
+                    stops: const [0.0, 20], // Adjust the stop values as needed
                   ).createShader(bounds);
                 },
                 child: ClipRRect(
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(17.0),
                     topRight: Radius.circular(17.0),
                   ),

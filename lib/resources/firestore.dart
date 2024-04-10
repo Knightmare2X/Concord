@@ -290,20 +290,21 @@ class FirestoreMethods {
 
   Future<void> uploadDataWithoutImage(String username, String uid) async {
     try {
-      await _firestore.collection('Users').doc(uid).update({'username': username});
+      await _firestore
+          .collection('Users')
+          .doc(uid)
+          .update({'username': username});
     } catch (e) {
       print(e.toString());
       throw e;
     }
   }
 
-
-
-
   Future<bool> isUsernameUnique(String username) async {
     try {
       // Query Firestore to check if the username already exists
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Users')
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Users')
           .where('username', isEqualTo: username)
           .get();
 
@@ -315,11 +316,4 @@ class FirestoreMethods {
       return false; // Assume username is not unique in case of an error
     }
   }
-
-
-
-
-
-
-
 }

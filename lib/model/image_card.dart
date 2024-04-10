@@ -1,15 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:concord/model/post_box.dart';
 import 'package:concord/resources/firestore.dart';
+import 'package:concord/screens/explore_screen/post_box.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import 'like_animation.dart';
 
 class ImageCard extends StatefulWidget {
-  final snap;
+  final dynamic snap;
 
-  const ImageCard({required this.snap});
+  const ImageCard({Key? key, required this.snap}) : super(key: key);
 
   @override
   State<ImageCard> createState() => _ImageCardState();
@@ -26,7 +27,7 @@ class _ImageCardState extends State<ImageCard> {
         showModalBottomSheet(
             context: context,
             builder: (BuildContext context) {
-              return Container(
+              return SizedBox(
                 height: 200,
                 child: Center(
                   child: Column(
@@ -35,7 +36,7 @@ class _ImageCardState extends State<ImageCard> {
                     children: <Widget>[
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.red,
+                          backgroundColor: Colors.red,
                           minimumSize: const Size.fromHeight(50), // NEW
                         ),
                         child: const Text(
@@ -55,10 +56,14 @@ class _ImageCardState extends State<ImageCard> {
             });
       },
       onTap: () async {
-        await FirestoreMethods()
-            .viewPost(widget.snap['postId'], user.uid, widget.snap['views']);
-        Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-            builder: (context) => PostBox(snap: widget.snap)));
+        if (context.mounted) {
+          await FirestoreMethods()
+              .viewPost(widget.snap['postId'], user.uid, widget.snap['views']);
+          if (context.mounted) {
+            Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+                builder: (context) => PostBox(snap: widget.snap)));
+          }
+        }
       },
       child: Column(
         children: [
@@ -77,8 +82,6 @@ class _ImageCardState extends State<ImageCard> {
                   duration: const Duration(milliseconds: 200),
                   opacity: isLikeAnimating ? 1 : 0,
                   child: LikeAnimation(
-                    child: const Icon(Icons.favorite,
-                        color: Colors.white, size: 100),
                     isAnimating: isLikeAnimating,
                     duration: const Duration(
                       milliseconds: 400,
@@ -88,6 +91,8 @@ class _ImageCardState extends State<ImageCard> {
                         isLikeAnimating = false;
                       });
                     },
+                    child: const Icon(Icons.favorite,
+                        color: Colors.white, size: 100),
                   ),
                 ),
               ],
@@ -100,87 +105,78 @@ class _ImageCardState extends State<ImageCard> {
               });
             },
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           Column(
             children: [
-              Container(
-                  child: Row(
+              Row(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 5,
                   ),
-                  Container(
-                    //color: Colors.green,
-                    child: CachedNetworkImage(
-                      imageUrl: widget.snap['profImage'],
-                      imageBuilder: (context, imageProvider) => CircleAvatar(
-                        radius: 9,
-                        backgroundImage: imageProvider,
-                      ),
-                      placeholder: (context, url) =>
-                          CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => Icon(Icons.error),
+                  CachedNetworkImage(
+                    imageUrl: widget.snap['profImage'],
+                    imageBuilder: (context, imageProvider) => CircleAvatar(
+                      radius: 9,
+                      backgroundImage: imageProvider,
                     ),
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
                   ),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8),
                       child: ClipRRect(
-                        child: Container(
-                            //color: Colors.blue,
-                            child: Padding(
+                        child: Padding(
                           padding: const EdgeInsets.all(0.0),
                           child: Text(
                             widget.snap['displayName'],
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 15.0,
                               fontFamily: 'Josefin',
                               fontWeight: FontWeight.normal,
                             ),
                           ),
-                        )),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    child: LikeAnimation(
-                      isAnimating: widget.snap['likes'].contains(user.uid),
-                      smallLike: true,
-                      child: GestureDetector(
-                        onTap: () async => await FirestoreMethods().tLikePost(
-                          widget.snap['postId'].toString(),
-                          user.uid,
-                          widget.snap['likes'],
                         ),
-                        child: widget.snap['likes'].contains(user.uid)
-                            ? Icon(
-                                Icons.favorite,
-                                size: 16,
-                                color: Colors.red,
-                              )
-                            : Icon(
-                                Icons.favorite_border,
-                                size: 16,
-                              ),
                       ),
                     ),
                   ),
-                  SizedBox(width: 3),
-                  Container(
-                    child: Text(
-                      NumberFormat.compact()
-                          .format(widget.snap['likes'].length)
-                          .toLowerCase(),
+                  LikeAnimation(
+                    isAnimating: widget.snap['likes'].contains(user.uid),
+                    smallLike: true,
+                    child: GestureDetector(
+                      onTap: () async => await FirestoreMethods().tLikePost(
+                        widget.snap['postId'].toString(),
+                        user.uid,
+                        widget.snap['likes'],
+                      ),
+                      child: widget.snap['likes'].contains(user.uid)
+                          ? const Icon(
+                              Icons.favorite,
+                              size: 16,
+                              color: Colors.red,
+                            )
+                          : const Icon(
+                              Icons.favorite_border,
+                              size: 16,
+                            ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(width: 3),
+                  Text(
+                    NumberFormat.compact()
+                        .format(widget.snap['likes'].length)
+                        .toLowerCase(),
+                  ),
+                  const SizedBox(
                     width: 5,
                   ),
                 ],
-              )),
+              ),
             ],
           ),
         ],

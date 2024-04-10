@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class CommentCard extends StatefulWidget {
-  final snap;
+  final dynamic snap;
   const CommentCard({Key? key, required this.snap}) : super(key: key);
 
   @override
@@ -13,8 +13,6 @@ class CommentCard extends StatefulWidget {
 }
 
 class _CommentCardState extends State<CommentCard> {
-
-
   final User user = FirebaseAuth.instance.currentUser!;
 
   @override
@@ -37,10 +35,8 @@ class _CommentCardState extends State<CommentCard> {
                     left: 16,
                   ),
                   child: Column(
-                    crossAxisAlignment:
-                    CrossAxisAlignment.start,
-                    mainAxisAlignment:
-                    MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       RichText(
                         text: TextSpan(children: [
@@ -52,14 +48,12 @@ class _CommentCardState extends State<CommentCard> {
                             ),
                           ),
                           TextSpan(
-                            text:
-                            '  ${widget.snap.data()['text']}',
+                            text: '  ${widget.snap.data()['text']}',
                           ),
                         ]),
                       ),
                       Padding(
-                        padding:
-                        const EdgeInsets.only(top: 4),
+                        padding: const EdgeInsets.only(top: 4),
                         child: Text(
                           DateFormat.yMMMd().format(
                             widget.snap.data()['datePublished'].toDate(),
@@ -76,14 +70,22 @@ class _CommentCardState extends State<CommentCard> {
               ),
               Row(
                 children: [
-                  const SizedBox(width: 5,),
+                  const SizedBox(
+                    width: 5,
+                  ),
                   LikeAnimation(
                     isAnimating: widget.snap['likes'].contains(user.uid),
                     child: GestureDetector(
-                      child: widget.snap['likes'].contains(user.uid)?
-                      const Icon(Icons.favorite,size: 20,color: Colors.red,)
-                          :
-                      const Icon(Icons.favorite_border,size: 20,),
+                      child: widget.snap['likes'].contains(user.uid)
+                          ? const Icon(
+                              Icons.favorite,
+                              size: 20,
+                              color: Colors.red,
+                            )
+                          : const Icon(
+                              Icons.favorite_border,
+                              size: 20,
+                            ),
                       onTap: () => FirestoreMethods().likeComment(
                         widget.snap['commentId'].toString(),
                         widget.snap['postId'].toString(),
@@ -93,13 +95,19 @@ class _CommentCardState extends State<CommentCard> {
                     ),
                   ),
                   const SizedBox(width: 5),
-                  Text(NumberFormat.compact().format(widget.snap['likes'].length).toLowerCase(),),
+                  Text(
+                    NumberFormat.compact()
+                        .format(widget.snap['likes'].length)
+                        .toLowerCase(),
+                  ),
                 ],
               ),
             ],
           ),
         ),
-        const SizedBox(height: 20,)
+        const SizedBox(
+          height: 20,
+        )
       ],
     );
   }

@@ -56,12 +56,11 @@ class _LikeAnimationState extends State<LikeAnimation>
         ),
       );
 
-      if(widget.onEnd != null){
+      if (widget.onEnd != null) {
         widget.onEnd!();
       }
     }
   }
-
 
   @override
   void dispose() {
@@ -72,7 +71,7 @@ class _LikeAnimationState extends State<LikeAnimation>
   @override
   Widget build(BuildContext context) {
     return ScaleTransition(
-        scale: scale,
+      scale: scale,
       child: widget.child,
     );
   }

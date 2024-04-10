@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:concord/resources/auth.dart';
 import 'package:concord/resources/firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
@@ -37,7 +37,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     "assets/placeholders/placeholder4.png",
   ];
 
-
   @override
   void initState() {
     super.initState();
@@ -50,7 +49,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     try {
-      final userData = await FirebaseFirestore.instance.collection('Users').doc(widget.uid).get();
+      final userData = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(widget.uid)
+          .get();
       final descPicsData = userData['descPic'] as List<dynamic>;
       descPics = descPicsData.cast<String>(); // Convert to List<String>
     } catch (error) {
@@ -65,12 +67,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-            body: isLoading
-                ? Center(child: CircularProgressIndicator(),
+    return Scaffold(
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
             )
-                :
-            SingleChildScrollView(
+          : SingleChildScrollView(
               child: SafeArea(
                 child: StreamBuilder<DocumentSnapshot>(
                     stream: FirebaseFirestore.instance
@@ -79,10 +81,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
+                        return const CircularProgressIndicator();
                       }
                       if (!snapshot.hasData || snapshot.data == null) {
-                        return Center(
+                        return const Center(
                           child: Text(
                             'No data available',
                             style: TextStyle(
@@ -120,25 +122,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               children: [
                                 Text(
                                   userData['username'] ?? ' User Profile',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 30,
                                     fontWeight: FontWeight.bold,
                                     fontFamily: 'Josefin',
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 8,
                                 ),
                                 // Show modal bottom sheet when the settings icon is tapped
                                 if (FirebaseAuth.instance.currentUser!.uid ==
                                     widget.uid)
                                   IconButton(
-                                    icon: Icon(Icons.settings),
+                                    icon: const Icon(Icons.settings),
                                     onPressed: () {
                                       // Show the modal bottom sheet
                                       showModalBottomSheet<void>(
                                         context: context,
-                                        shape: RoundedRectangleBorder(
+                                        shape: const RoundedRectangleBorder(
                                           borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(10),
                                             topRight: Radius.circular(10),
@@ -173,7 +175,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                       {
                                                     signOut(context);
                                                   },
-                                                  child: Text(
+                                                  child: const Text(
                                                     "Sign Out",
                                                     style: TextStyle(
                                                       color: Colors.white,
@@ -200,7 +202,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               padding: EdgeInsets.zero,
                               itemCount: descPics.length,
                               gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
                                 mainAxisSpacing: 8,
                                 crossAxisSpacing: 8,
@@ -230,11 +232,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                               horizontal: 16,
                             ),
                             child: Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 16),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16),
@@ -243,11 +245,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 children: <Widget>[
                                   GestureDetector(
                                     onTap: () {
-                                      if (userData['photoURL'] != null && userData['photoURL'].isNotEmpty) {
+                                      if (userData['photoURL'] != null &&
+                                          userData['photoURL'].isNotEmpty) {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => FullScreenImage(
+                                            builder: (context) =>
+                                                FullScreenImage(
                                               imageUrl: userData['photoURL'],
                                             ),
                                           ),
@@ -256,21 +260,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     },
                                     child: Hero(
                                       tag: "profile_avatar",
-                                      child: Container(
-                                        width: MediaQuery.of(context).size.width * 0.2,
-                                        height: MediaQuery.of(context).size.width * 0.2,
-                                        child: userData['photoURL'] != null && userData['photoURL'].isNotEmpty
+                                      child: SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.2,
+                                        height:
+                                            MediaQuery.of(context).size.width *
+                                                0.2,
+                                        child: userData['photoURL'] != null &&
+                                                userData['photoURL'].isNotEmpty
                                             ? CircleAvatar(
-                                          backgroundImage: NetworkImage(userData['photoURL']),
-                                        )
+                                                backgroundImage: NetworkImage(
+                                                    userData['photoURL']),
+                                              )
                                             : Icon(
-                                          Icons.account_circle,
-                                          size: MediaQuery.of(context).size.width * 0.2, // Adjust size as needed
-                                        ),
+                                                Icons.account_circle,
+                                                size: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.2, // Adjust size as needed
+                                              ),
                                       ),
                                     ),
                                   ),
-
                                   SizedBox(
                                       width: MediaQuery.of(context).size.width *
                                           0.01),
@@ -289,14 +301,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               NumberFormat.compact()
                                                   .format(viewLen)
                                                   .toLowerCase()),
-                                          SizedBox(width: 16),
+                                          const SizedBox(width: 16),
                                           _buildStat(
                                               context,
                                               "Followers",
                                               NumberFormat.compact()
                                                   .format(followers)
                                                   .toLowerCase()),
-                                          SizedBox(width: 16),
+                                          const SizedBox(width: 16),
                                           _buildStat(
                                               context,
                                               "Following",
@@ -314,7 +326,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           FirebaseAuth.instance.currentUser!.uid == widget.uid
                               ? FollowButton(
                                   text: 'Edit Profile',
-                                  backgroundColor: Color.fromRGBO(0, 0, 0, 1),
+                                  backgroundColor:
+                                      const Color.fromRGBO(0, 0, 0, 1),
                                   textColor: Colors.white,
                                   borderColor: Colors.grey,
                                   function: () {},
@@ -385,7 +398,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 }
                                 if (!snapshot.hasData ||
                                     snapshot.data == null) {
-                                  return Center(
+                                  return const Center(
                                     child: Text(
                                       'No posts',
                                       style: TextStyle(
@@ -421,7 +434,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     }),
               ),
             ),
-          );
+    );
   }
 
   getImageWidget(String imageUrl) {
@@ -468,7 +481,7 @@ Widget _buildStat(BuildContext context, String label, String value) {
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           label,
           style: TextStyle(fontSize: fontSize),
@@ -481,8 +494,7 @@ Widget _buildStat(BuildContext context, String label, String value) {
 class FullScreenImage extends StatelessWidget {
   final String imageUrl;
 
-
-  const FullScreenImage({required this.imageUrl});
+  const FullScreenImage({Key? key, required this.imageUrl}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -498,7 +510,7 @@ class FullScreenImage extends StatelessWidget {
               tag: imageUrl,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child:getImageWidget(imageUrl),
+                child: getImageWidget(imageUrl),
               ),
             ),
           ),
@@ -507,7 +519,7 @@ class FullScreenImage extends StatelessWidget {
     );
   }
 
-  getImageWidget(String imageUrl){
+  getImageWidget(String imageUrl) {
     if (imageUrl.startsWith("assets")) {
       return CachedNetworkImage(
         imageUrl: imageUrl,
