@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:concord/screens/explore_screen/explore_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -22,6 +23,13 @@ class _UploadImagesState extends State<UploadImages> {
   final TextEditingController _descriptionController = TextEditingController();
   bool _isLoading = false;
   bool _isClicked = true;
+  late Future<DocumentSnapshot> _userDataFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _userDataFuture = FirebaseFirestore.instance.collection('Users').doc(user.uid).get();
+  }
 
   Future<void> imagePick() async {
     Uint8List file = await pickImage(ImageSource.gallery);
@@ -61,6 +69,10 @@ class _UploadImagesState extends State<UploadImages> {
           }
           clearImage();
           _descriptionController.clear();
+          if (context.mounted) {
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ExploreScreen()));
+          }
+
         } else {
           if (context.mounted) {
             showSnackBar(context, res);
@@ -134,8 +146,7 @@ class _UploadImagesState extends State<UploadImages> {
 
   Widget _buildImagePreview() {
     return FutureBuilder<DocumentSnapshot>(
-      future:
-      FirebaseFirestore.instance.collection('Users').doc(user.uid).get(),
+      future: _userDataFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
@@ -224,7 +235,6 @@ class _UploadImagesState extends State<UploadImages> {
                       alignment: Alignment.bottomCenter,
                       child: OutlinedButton(
                         onPressed: () {
-                          // This is what you should add in your code
                           if (_isClicked) {
                             _isClicked = false;
                             postImage(user.uid, username, photoURL);
