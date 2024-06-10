@@ -1,12 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:concord/model/comment_card.dart';
+import 'package:concord/widgets/comment_card.dart';
 import 'package:concord/resources/firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../model/like_animation.dart';
+import '../../widgets/like_animation.dart';
+
 
 class PostBox extends StatefulWidget {
   final dynamic snap;
@@ -189,6 +190,8 @@ class _PostBoxState extends State<PostBox> {
         ),
       ),
       //COMMENT TEXT BAR
+
+
       bottomNavigationBar: SafeArea(
         child: FutureBuilder<DocumentSnapshot>(
             future: FirebaseFirestore.instance

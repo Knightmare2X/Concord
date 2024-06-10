@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:concord/model/persist_nav_bar.dart';
+import 'package:concord/widgets/persist_nav_bar.dart';
 import 'package:concord/screens/new_user_screens/create_desc_pic_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

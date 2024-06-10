@@ -1,8 +1,9 @@
-import 'package:concord/model/like_animation.dart';
 import 'package:concord/resources/firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import 'like_animation.dart';
 
 class CommentCard extends StatefulWidget {
   final dynamic snap;
@@ -78,14 +79,14 @@ class _CommentCardState extends State<CommentCard> {
                     child: GestureDetector(
                       child: widget.snap['likes'].contains(user.uid)
                           ? const Icon(
-                              Icons.favorite,
-                              size: 20,
-                              color: Colors.red,
-                            )
+                        Icons.favorite,
+                        size: 20,
+                        color: Colors.red,
+                      )
                           : const Icon(
-                              Icons.favorite_border,
-                              size: 20,
-                            ),
+                        Icons.favorite_border,
+                        size: 20,
+                      ),
                       onTap: () => FirestoreMethods().likeComment(
                         widget.snap['commentId'].toString(),
                         widget.snap['postId'].toString(),

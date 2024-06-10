@@ -1,7 +1,13 @@
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:provider/provider.dart';
+
+import '../../resources/music_provider.dart';
+import 'preview_screen.dart';
+
 class UploadSong extends StatefulWidget {
   const UploadSong({Key? key}) : super(key: key);
 
@@ -12,6 +18,12 @@ class UploadSong extends StatefulWidget {
 class _UploadSongState extends State<UploadSong> {
   String? selectedImagePath;
   Uint8List? selectedImageBytes;
+  String? selectedAudioPath;
+  final TextEditingController songNameController = TextEditingController();
+  final TextEditingController performedByController = TextEditingController();
+  final TextEditingController writtenByController = TextEditingController();
+  final TextEditingController producedByController = TextEditingController();
+  final AudioPlayer audioPlayer = AudioPlayer();
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -25,358 +37,198 @@ class _UploadSongState extends State<UploadSong> {
     }
   }
 
+  Future<void> _pickAudio() async {
+    final result = await FilePicker.platform.pickFiles(type: FileType.audio);
+    if (result != null) {
+      final String? path = result.files.single.path;
+      if (path != null) {
+        // Check the duration of the audio file
+        await audioPlayer.setSourceUrl(path);
+        final Duration? duration = await audioPlayer.getDuration();
+        if (duration != null && duration.inSeconds <= 105) {
+          setState(() {
+            selectedAudioPath = path;
+          });
+        } else {
+          // Show an error if the audio file is too long
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Audio file is longer than 1 minute 45 seconds')),
+          );
+        }
+      }
+    }
+  }
+
+  void _upload() {
+    if (selectedImageBytes != null && selectedAudioPath != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PreviewScreen(
+            imageBytes: selectedImageBytes!,
+            audioPath: selectedAudioPath!,
+            songName: songNameController.text,
+            performedBy: performedByController.text,
+            writtenBy: writtenByController.text,
+            producedBy: producedByController.text,
+          ),
+        ),
+      ).then((_) {
+        // After returning from PreviewScreen, refresh the songs in MusicProvider
+        final musicProvider = Provider.of<MusicProvider>(context, listen: false);
+        musicProvider.fetchSongs();
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please select both an image and an audio file')),
+      );
+    }
+  }
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: /*_file == null ?*/ _buildUploadButton() /*: _buildSongPreview()*/,
+      body: _buildUploadButton(),
     );
   }
 
   Widget _buildUploadButton() {
     return Scaffold(
-        body: SingleChildScrollView(
-          child: Stack(
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
             children: [
-              Center(
-                child: Column(
+              InkWell(
+                onTap: _pickImage,
+                child: Stack(
+                  alignment: Alignment.center,
                   children: [
-                    /*Container(
+                    Container(
                       width: MediaQuery.of(context).size.width * 0.9,
                       height: MediaQuery.of(context).size.width * 0.9,
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: Colors.white, // Border color
-                          width: 2, // Border width
+                          color: Colors.white,
+                          width: 2,
                         ),
-                        borderRadius: BorderRadius.circular(10), // Rounded corners
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      child: TextButton(
-                        onPressed: () {},
-                        child: const Text(
+                      child: selectedImageBytes == null
+                          ? Center(
+                        child: Text(
                           'Upload Albumart',
                           style: TextStyle(
-                            color: Colors.white, // Text color
-                            fontSize: 20, // Text size
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    ),*/
-                    //ALBUMART
-
-
-                    InkWell(
-                      onTap: _pickImage,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.9, // Adjust width as needed
-                            height: MediaQuery.of(context).size.width * 0.9, // Adjust height as needed
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.white, // Border color
-                                width: 2, // Border width
-                              ),
-                              borderRadius: BorderRadius.circular(10), // Rounded corners
-                            ),
-                            child: selectedImageBytes == null
-                                ? Center(
-                                  child: Text(
-                              'Upload Albumart',
-                              style: TextStyle(
-                                  color: Colors.white, // Text color
-                                  fontSize: 20,
-                                fontWeight: FontWeight.bold// Text size
-                              ),
-                            ),
-                                )
-                                : ClipRRect(
-                              borderRadius: BorderRadius.circular(10), // Match border radius
-                              child: Image.memory(
-                                selectedImageBytes!,
-                                width: MediaQuery.of(context).size.width * 0.9,
-                                height: MediaQuery.of(context).size.width * 0.9,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          if (selectedImageBytes == null && selectedImagePath != null)
-                            CircularProgressIndicator(), // Show loading indicator if image is being loaded
-                        ],
-                      ),
-                    ),
-
-
-                    SizedBox(height: 20,),
-
-
-                    // MASTER FILE
-
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.white, // Border color
-                          width: 2, // Border width
-                        ),
-                        borderRadius: BorderRadius.circular(10), // Rounded corners
-                      ),
-                      child: TextButton(
-                        onPressed: () {},
-                        child: const Text(
-                          'Upload Master file',
-                          style: TextStyle(
-                            color: Colors.white, // Text color
-                            fontSize: 20, // Text size
-                          ),
+                      )
+                          : ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.memory(
+                          selectedImageBytes!,
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          height: MediaQuery.of(context).size.width * 0.9,
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
-                    SizedBox(height: 20,),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.white, // Border color
-                          width: 2, // Border width
-                        ),
-                        borderRadius: BorderRadius.circular(10), // Rounded corners
-                      ),
-                      child: TextButton(
-                        onPressed: () {},
-                        child: const Text(
-                          'Performed by',
-                          style: TextStyle(
-                            color: Colors.white, // Text color
-                            fontSize: 20, // Text size
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20,),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.white, // Border color
-                          width: 2, // Border width
-                        ),
-                        borderRadius: BorderRadius.circular(10), // Rounded corners
-                      ),
-                      child: TextButton(
-                        onPressed: () {},
-                        child: const Text(
-                          'Written by',
-                          style: TextStyle(
-                            color: Colors.white, // Text color
-                            fontSize: 20, // Text size
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20,),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.white, // Border color
-                          width: 2, // Border width
-                        ),
-                        borderRadius: BorderRadius.circular(10), // Rounded corners
-                      ),
-                      child: TextButton(
-                        onPressed: () {},
-                        child: const Text(
-                          'Produced by',
-                          style: TextStyle(
-                            color: Colors.white, // Text color
-                            fontSize: 20, // Text size
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20,),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.white, // Border color
-                          width: 2, // Border width
-                        ),
-                        borderRadius: BorderRadius.circular(10), // Rounded corners
-                      ),
-                      child: TextButton(
-                        onPressed: () {},
-                        child: const Text(
-                          'Upload',
-                          style: TextStyle(
-                            color: Colors.white, // Text color
-                            fontSize: 20, // Text size
-                          ),
-                        ),
-                      ),
-                    ),
+                    if (selectedImageBytes == null && selectedImagePath != null)
+                      CircularProgressIndicator(),
                   ],
                 ),
               ),
-
-
-            ],
-          ),
-        ));
-  }
-
-
-}
-
-/*Widget _buildUploadButton() {
-    return Scaffold(
-        body: Stack(
-      children: [
-        Center(
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.9,
-            height: MediaQuery.of(context).size.width * 0.9,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.white, // Border color
-                width: 2, // Border width
-              ),
-              borderRadius: BorderRadius.circular(10), // Rounded corners
-            ),
-            child: TextButton(
-              onPressed: () => imagePick(),
-              child: const Text(
-                'Upload Image',
-                style: TextStyle(
-                  color: Colors.white, // Text color
-                  fontSize: 20, // Text size
+              SizedBox(height: 20),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextButton(
+                  onPressed: _pickAudio,
+                  child: Text(
+                    selectedAudioPath == null
+                        ? 'Upload Master file'
+                        : 'Audio Selected: ${selectedAudioPath!.split('/').last}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
                 ),
               ),
-            ),
+              SizedBox(height: 10),
+          Container(
+            width: MediaQuery.of(context).size.width * 0.9,
+            child: Text(
+              'Note: The song duration must not be greater than 1 minute 45 seconds',
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 14,
+              )),
           ),
-        ),
-      ],
-    ));
-  }*/
-
-/*Widget _buildImagePreview() {
-  return FutureBuilder<DocumentSnapshot>(
-    future:
-    FirebaseFirestore.instance.collection('Users').doc(user.uid).get(),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      }
-      if (snapshot.hasError) {
-        return Text('Error: ${snapshot.error}');
-      }
-      if (!snapshot.hasData || !snapshot.data!.exists) {
-        return const Text('User not found'); // handle if user not found
-      }
-
-      Map<String, dynamic> userData =
-      snapshot.data!.data() as Map<String, dynamic>;
-      String username = userData['username'];
-      String photoURL = userData['photoURL'];
-
-      return Scaffold(
-        body: WillPopScope(
-          onWillPop: () async {
-            clearImage();
-            Navigator.pop(context);
-            return false;
-          },
-          child: SafeArea(
-            child: ListView(children: [
-              Column(
-                children: [
-                  _isLoading ? const LinearProgressIndicator() : Container(),
-                  Container(),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16.0),
-                    child: Image.memory(
-                      _file!,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
+              SizedBox(height: 20),
+              _buildTextField('Song Name', songNameController),
+              SizedBox(height: 20),
+              _buildTextField('Performed by', performedByController),
+              SizedBox(height: 20),
+              _buildTextField('Written by', writtenByController),
+              SizedBox(height: 20),
+              _buildTextField('Produced by', producedByController),
+              SizedBox(height: 20),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextButton(
+                  onPressed: _upload,
+                  child: const Text(
+                    'Preview',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
                     ),
                   ),
-                  const SizedBox(
-                    height: 8.0,
-                  ),
-                  Column(
-                    children: [
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16.0),
-                          child: Container(
-                            color: Colors.white24,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                DateFormat('dd MMMM yyyy')
-                                    .format(DateTime.now()),
-                                textAlign: TextAlign.end,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CircleAvatar(
-                        backgroundImage: NetworkImage(photoURL),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        child: TextField(
-                          controller: _descriptionController,
-                          decoration: const InputDecoration(
-                            hintText: 'Write a caption...',
-                            border: InputBorder.none,
-                          ),
-                          maxLines: 4,
-                        ),
-                      ),
-                      // OutlinedButton
-                    ],
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: OutlinedButton(
-                      onPressed: () {
-                        // This is what you should add in your code
-                        if (_isClicked) {
-                          _isClicked = false;
-                          postImage(user.uid, username, photoURL);
-                        }
-                      },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.blueAccent,
-                        side: const BorderSide(color: Colors.lightBlue),
-                      ),
-                      child: const Text('Post'),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  )
-                ],
+                ),
               ),
             ],
-            ),
           ),
         ),
-      );
-    },
-  );
-}*/
+      ),
+    );
+  }
+
+  Widget _buildTextField(String hint, TextEditingController controller) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.9,
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.white,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: TextField(
+        controller: controller,
+        style: TextStyle(color: Colors.white, fontSize: 20),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(color: Colors.white54),
+          border: InputBorder.none,
+        ),
+      ),
+    );
+  }
+}

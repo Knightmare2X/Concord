@@ -1,4 +1,4 @@
-import 'package:concord/model/image_card.dart';
+import 'package:concord/widgets/image_card.dart';
 import 'package:concord/screens/search_screen/search_bar_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';

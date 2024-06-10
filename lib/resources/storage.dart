@@ -1,4 +1,6 @@
 import 'dart:typed_data';
+import 'dart:io';
+
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -25,4 +27,14 @@ class StorageMethods {
     String downloadUrl = await snap.ref.getDownloadURL();
     return downloadUrl;
   }
+  Future<String> uploadFileToStorage(String childName, String filePath) async {
+    Reference ref = _storage.ref().child(childName).child(Uuid().v1());
+
+    UploadTask uploadTask = ref.putFile(File(filePath));
+    TaskSnapshot snap = await uploadTask;
+    String downloadUrl = await snap.ref.getDownloadURL();
+    return downloadUrl;
+  }
+
+
 }

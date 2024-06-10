@@ -8,8 +8,8 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 
-import '../model/follow_button.dart';
-import '../model/image_card.dart';
+import '../widgets/follow_button.dart';
+import '../widgets/image_card.dart';
 import '../utils/utils.dart';
 
 class ProfileScreen extends StatefulWidget {

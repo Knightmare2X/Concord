@@ -1,106 +1,128 @@
-import 'package:concord/screens/music_screen/music_screen.dart';
-import 'package:concord/screens/upload_screen/upload_song.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../model/neu_box.dart';
 import '../../resources/music_provider.dart';
+import '../../widgets/neu_box.dart';
+import '../upload_screen/upload_song.dart';
+import 'music_screen.dart';
 
 class SongScreen extends StatelessWidget {
   const SongScreen({Key? key}) : super(key: key);
 
-  //convert duration into min: sec
+  // Convert duration into min:sec
   String formatTime(Duration duration) {
-    String twoDigitSeconds =
-        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-    String formattedTime = "${duration.inMinutes}: $twoDigitSeconds";
-
+    String twoDigitSeconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    String formattedTime = "${duration.inMinutes}:$twoDigitSeconds";
     return formattedTime;
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<MusicProvider>(builder: (context, value, child) {
-      //get Music
+      // Check if loading
+      if (value.isLoading) {
+        return Scaffold(
+          backgroundColor: Colors.black,
+          body: Center(
+            child: CircularProgressIndicator(), // Or any other placeholder widget
+          ),
+        );
+      }
+
+      // Get music
       final music = value.music;
 
-      // get current song index
-      final currentSong = music[value.currentSongIndex ?? 0];
+      // Check if music list is empty
+      if (music.isEmpty) {
+        // Handle the case where music list is empty
+        return Scaffold(
+          backgroundColor: Colors.black,
+          body: Center(
+            child: Text(
+              "No songs available",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        );
+      }
 
-      //return scaffold UI
+      // Get current song index
+      final currentSongIndex = value.currentSongIndex ?? 0;
+
+      // Return scaffold UI
       return Scaffold(
         backgroundColor: Colors.black,
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
-            child:
-                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              //app bar
+            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              // App bar
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  //backbutton
+                  // Back button
                   IconButton(
                     onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const UploadSong())),
+                        context, MaterialPageRoute(builder: (context) => const UploadSong())),
                     icon: const Icon(Icons.add_box_outlined),
                   ),
 
-                  //menu button
+                  // Menu button
                   IconButton(
                     onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const MusicScreen())),
+                        context, MaterialPageRoute(builder: (context) => const MusicScreen())),
                     icon: const Icon(Icons.menu),
                   ),
                 ],
-              ), // album artwork
+              ),
+
+              // Album artwork
               NeuBox(
-                  child: Column(
-                children: [
-                  //image
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.asset(currentSong.albumArtImagePath),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        //song and artist name
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              currentSong.songName,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
-                            ),
-                            Text(currentSong.artistName),
-                          ],
-                        ),
+                child: Column(
+                  children: [
+                    // Image
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(music[currentSongIndex].albumArtUrl,
 
-                        // heart like
-                        const Icon(
-                          Icons.favorite,
-                          color: Colors.red,
-                        )
-                      ],
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        height: MediaQuery.of(context).size.width * 0.9,
+                        fit: BoxFit.cover,),
                     ),
-                  )
+                    Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Song and artist name
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                music[currentSongIndex].songName,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              Text(music[currentSongIndex].artistName),
+                            ],
+                          ),
 
-                  //
-                ],
-              )),
+                          // Heart like
+                          const Icon(
+                            Icons.favorite,
+                            color: Colors.red,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 25.0),
 
-              // song duration progress
+              // Song duration progress
               Column(
                 children: [
                   Padding(
@@ -110,43 +132,43 @@ class SongScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            //start time
-                            Text(formatTime(value.currentDuration)), //end time
+                            // Start time
+                            Text(formatTime(value.currentDuration)),
+                            // End time
                             Text(formatTime(value.totalDuration)),
                           ],
                         ),
                       ],
                     ),
                   ),
-                  // song duration progress slider
+
+                  // Song duration progress slider
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
-                        thumbShape:
-                            const RoundSliderThumbShape(enabledThumbRadius: 0)),
+                      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 0),
+                    ),
                     child: Slider(
                       min: 0,
                       max: value.totalDuration.inSeconds.toDouble(),
                       value: value.currentDuration.inSeconds.toDouble(),
                       activeColor: Colors.lightBlue,
-                      onChanged: (double double) {
-                        // during when the user is sliding around
+                      onChanged: (double newValue) {
+                        // During when the user is sliding around
                       },
-                      onChangeEnd: (double double) {
-                        // sliding has finished, go to that position in song duration
-                        value.seek(Duration(seconds: double.toInt()));
+                      onChangeEnd: (double newValue) {
+                        // Sliding has finished, go to that position in song duration
+                        value.seek(Duration(seconds: newValue.toInt()));
                       },
                     ),
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 25,
-              ),
+              const SizedBox(height: 25),
 
-              // playback controls
+              // Playback controls
               Row(
                 children: [
-                  //skip previous
+                  // Skip previous
                   Expanded(
                     child: GestureDetector(
                       onTap: value.playPreviousSong,
@@ -155,25 +177,21 @@ class SongScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    width: 20.0,
-                  ),
-                  //play/pause
+                  const SizedBox(width: 20.0),
+
+                  // Play/pause
                   Expanded(
                     flex: 2,
                     child: GestureDetector(
                       onTap: value.pauseOrResume,
                       child: NeuBox(
-                        child: Icon(
-                            value.isPlaying ? Icons.pause : Icons.play_arrow),
+                        child: Icon(value.isPlaying ? Icons.pause : Icons.play_arrow),
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    width: 20.0,
-                  ),
+                  const SizedBox(width: 20.0),
 
-                  //skip forward
+                  // Skip forward
                   Expanded(
                     child: GestureDetector(
                       onTap: value.playNextSong,
@@ -183,7 +201,7 @@ class SongScreen extends StatelessWidget {
                     ),
                   ),
                 ],
-              )
+              ),
             ]),
           ),
         ),

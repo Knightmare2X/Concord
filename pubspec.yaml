@@ -2,7 +2,6 @@ name: concord
 description: Harmony in building.
 publish_to: 'none'
 
-
 version: 1.0.0+1
 
 environment:
@@ -34,6 +33,7 @@ dependencies:
   persistent_bottom_nav_bar: ^5.0.2
   image_painter: ^0.6.1
   audioplayers: ^5.2.1
+  file_picker: ^8.0.0+1
 
 
 dev_dependencies:

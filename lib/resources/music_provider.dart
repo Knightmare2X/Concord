@@ -1,33 +1,14 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:concord/resources/song.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../model/song.dart';
 
 class MusicProvider extends ChangeNotifier {
-  final List<Song> _music = [
-    Song(
-        songName: "feel good",
-        artistName: "ya boy",
-        albumArtImagePath: "assets/albumart/img.png",
-        audioPath: "assets/audio/feel_good.mp3",
-        writerName: "ya boy",
-        producerName: "ya boy"),
-    Song(
-        songName: "Careless",
-        artistName: "sim smith",
-        albumArtImagePath: "assets/albumart/img2.png",
-        audioPath: "assets/audio/careless.mp3",
-        writerName: "sim smith",
-        producerName: "sim smith"),
-  ];
+  List<Song> _songs = [];
 
   //current song playing index;
-
   int? _currentSongIndex;
 
-  /*
-  AUDIO PLAYER
-
- */
   // audio player
   final AudioPlayer _audioPlayer = AudioPlayer();
 
@@ -35,21 +16,68 @@ class MusicProvider extends ChangeNotifier {
   Duration _currentDuration = Duration.zero;
   Duration _totalDuration = Duration.zero;
 
-  //constructor
-  MusicProvider() {
-    listenToDuration();
-  }
-
   // initially not playing
   bool _isPlaying = false;
 
+  // loading state
+  bool _isLoading = true;
+
+  //constructor
+  MusicProvider() {
+    fetchSongs();
+    listenToDuration();
+  }
+
+  // fetch songs from Firestore
+  /*Future<void> fetchSongs() async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('Songs').get();
+      _songs = snapshot.docs.map((doc) => Song.fromSnap(doc)).toList();
+
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      print("Error fetching songs: $e");
+      notifyListeners();
+    }
+  }*/
+
+  Future<void> fetchSongs() async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      print("Fetching songs from Firestore...");
+      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('Songs').get();
+      print("Fetched ${snapshot.docs.length} songs.");
+
+      _songs = snapshot.docs.map((doc) => Song.fromSnap(doc)).toList();
+      print("Mapped songs: ${_songs.length}");
+
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      print("Error fetching songs: $e");
+      notifyListeners();
+    }
+  }
+
+
+
   // play the song
   void play() async {
-    final String path = _music[_currentSongIndex!].audioPath;
-    await _audioPlayer.stop(); // stop current song
-    await _audioPlayer.play(AssetSource(path)); //play the new song
-    _isPlaying = true;
-    notifyListeners();
+    if (_currentSongIndex != null) {
+      final String path = _songs[_currentSongIndex!].audioUrl;
+      await _audioPlayer.stop(); // stop current song
+      await _audioPlayer.play(UrlSource(path)); //play the new song
+      _isPlaying = true;
+      notifyListeners();
+    }
   }
 
   // pause the current song
@@ -84,7 +112,7 @@ class MusicProvider extends ChangeNotifier {
   // play the next song
   void playNextSong() {
     if (_currentSongIndex != null) {
-      if (_currentSongIndex! < _music.length - 1) {
+      if (_currentSongIndex! < _songs.length - 1) {
         //go to the next song if it's not the last song
         currentSongIndex = _currentSongIndex! + 1;
       } else {
@@ -106,7 +134,7 @@ class MusicProvider extends ChangeNotifier {
         currentSongIndex = _currentSongIndex! - 1;
       } else {
         // if it's the first song, loop back to  last song
-        currentSongIndex = _music.length - 1;
+        currentSongIndex = _songs.length - 1;
       }
     }
   }
@@ -131,17 +159,16 @@ class MusicProvider extends ChangeNotifier {
     });
   }
 
-  //dispose audio player
-
   /*
   GETTER
   */
 
-  List<Song> get music => _music;
+  List<Song> get music => _songs;
   int? get currentSongIndex => _currentSongIndex;
   bool get isPlaying => _isPlaying;
   Duration get currentDuration => _currentDuration;
   Duration get totalDuration => _totalDuration;
+  bool get isLoading => _isLoading;
 
   /*
   SETTER

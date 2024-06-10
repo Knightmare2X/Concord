@@ -1,10 +1,13 @@
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:concord/resources/comment.dart';
-import 'package:concord/resources/post.dart';
+import 'package:concord/model/comment.dart';
+import 'package:concord/model/post.dart';
 import 'package:concord/resources/storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
+
+import '../model/song.dart';
 
 class FirestoreMethods {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -316,4 +319,36 @@ class FirestoreMethods {
       return false; // Assume username is not unique in case of an error
     }
   }
+
+  // Upload song
+  Future<String> uploadSong(Song song, Uint8List albumArtBytes, String audioPath) async {
+    String res = "Some error occurred";
+    try {
+      String albumArtUrl = await StorageMethods().uploadImageToStorage('Songs/albumArts', albumArtBytes, true);
+      String audioUrl = await StorageMethods().uploadFileToStorage('Songs/audioFiles', audioPath);
+
+      String songId = const Uuid().v1();
+      String uid = FirebaseAuth.instance.currentUser!.uid;  // Get the UID of the current user
+      DateTime datePublished = DateTime.now();  // Get the current date and time
+
+      await _firestore.collection('Songs').doc(songId).set({
+        'songName': song.songName,
+        'artistName': song.artistName,
+        'albumArtUrl': albumArtUrl,
+        'audioUrl': audioUrl,
+        'writerName': song.writerName,
+        'producerName': song.producerName,
+        'uid': uid,  // Add the UID
+        'datePublished': datePublished, // Add the upload time
+        'songId': songId
+      });
+
+      res = "success";
+    } catch (err) {
+      res = err.toString();
+    }
+    return res;
+  }
+
+
 }

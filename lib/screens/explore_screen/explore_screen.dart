@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:concord/model/image_card.dart';
+import 'package:concord/widgets/image_card.dart';
 import 'package:concord/screens/upload_screen/upload_song.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

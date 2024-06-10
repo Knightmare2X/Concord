@@ -10,7 +10,7 @@ class Comment {
   final String displayName;
   final String profImage;
 
-  const Comment({
+   Comment({
     required this.text,
     required this.uid,
     required this.likes,
