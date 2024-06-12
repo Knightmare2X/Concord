@@ -189,6 +189,9 @@ class _PostBoxState extends State<PostBox> {
           ),
         ),
       ),
+
+
+
       //COMMENT TEXT BAR
 
 

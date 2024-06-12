@@ -10,6 +10,8 @@ class Song {
   final String uid;
   final DateTime datePublished;
   final String songId;
+  final dynamic likes;
+  final dynamic views;
 
   Song({
     required this.songName,
@@ -21,6 +23,8 @@ class Song {
     required this.uid,
     required this.datePublished,
     required this.songId,
+    required this.likes,
+    required this.views,
   });
 
   static Song fromSnap(DocumentSnapshot snap){
@@ -36,6 +40,8 @@ class Song {
       uid: snapshot['uid'],
       datePublished:  (snapshot['datePublished'] as Timestamp).toDate(),
       songId: snapshot['songId'],
+      likes: snapshot["likes"],
+      views: snapshot["views"],
     );
 
   }
@@ -50,6 +56,8 @@ class Song {
     'uid': uid,
     'datePublished': datePublished,
     'songId': songId,
+    "likes": likes,
+    "views": views,
   };
 
 

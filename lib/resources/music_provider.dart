@@ -46,6 +46,8 @@ class MusicProvider extends ChangeNotifier {
     }
   }*/
 
+  //fetch songs
+
   Future<void> fetchSongs() async {
     try {
       _isLoading = true;
@@ -185,4 +187,7 @@ class MusicProvider extends ChangeNotifier {
     //update UI
     notifyListeners();
   }
+
+
+
 }

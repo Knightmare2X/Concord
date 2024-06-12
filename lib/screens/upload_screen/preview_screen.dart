@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:concord/screens/music_screen/music_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../model/song.dart';
@@ -100,7 +101,9 @@ class _PreviewScreenState extends State<PreviewScreen> {
       producerName: widget.producedBy,
       uid: '', // This should be set appropriately
       datePublished: DateTime.now(),
-      songId: '', // This should be generated appropriately
+      songId: '',
+      likes: '',
+      views: '',
     );
 
     String res = await FirestoreMethods().uploadSong(song, widget.imageBytes, widget.audioPath);
@@ -110,7 +113,10 @@ class _PreviewScreenState extends State<PreviewScreen> {
 
     if (res == 'success') {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Song uploaded successfully')));
-      Navigator.pop(context); // Go back to the previous screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MusicScreen()),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res)));
     }

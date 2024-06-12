@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -30,7 +31,16 @@ class MusicScreen extends StatelessWidget {
           itemBuilder: (context, index) {
             final song = music[index];
             return ListTile(
-              leading: Image.network(song.albumArtUrl),
+              leading: ClipRRect(
+                borderRadius: BorderRadius.circular(5.0),
+                child: AspectRatio(
+                  aspectRatio: 1/1,
+                  child: Image.network(
+                    song.albumArtUrl,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
               title: Text(song.songName),
               subtitle: Text(song.artistName),
               onTap: () {

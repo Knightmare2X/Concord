@@ -321,34 +321,65 @@ class FirestoreMethods {
   }
 
   // Upload song
-  Future<String> uploadSong(Song song, Uint8List albumArtBytes, String audioPath) async {
+  Future<String> uploadSong(
+      Song song,
+      Uint8List albumArtBytes,
+      String audioPath,
+      ) async {
     String res = "Some error occurred";
     try {
       String albumArtUrl = await StorageMethods().uploadImageToStorage('Songs/albumArts', albumArtBytes, true);
       String audioUrl = await StorageMethods().uploadFileToStorage('Songs/audioFiles', audioPath);
 
       String songId = const Uuid().v1();
-      String uid = FirebaseAuth.instance.currentUser!.uid;  // Get the UID of the current user
-      DateTime datePublished = DateTime.now();  // Get the current date and time
+      String uid = FirebaseAuth.instance.currentUser!.uid; // Get the UID of the current user
 
-      await _firestore.collection('Songs').doc(songId).set({
-        'songName': song.songName,
-        'artistName': song.artistName,
-        'albumArtUrl': albumArtUrl,
-        'audioUrl': audioUrl,
-        'writerName': song.writerName,
-        'producerName': song.producerName,
-        'uid': uid,  // Add the UID
-        'datePublished': datePublished, // Add the upload time
-        'songId': songId
-      });
+      Song newSong = Song(
+        songName: song.songName,
+        artistName: song.artistName,
+        albumArtUrl: albumArtUrl,
+        audioUrl: audioUrl,
+        writerName: song.writerName,
+        producerName: song.producerName,
+        uid: uid,
+        datePublished: DateTime.now(),
+        songId: songId,
+        likes: [],
+        views: [],
+      );
 
+      _firestore.collection('Songs').doc(songId).set(newSong.toJson());
       res = "success";
     } catch (err) {
       res = err.toString();
     }
     return res;
   }
+
+  //like songs
+  Future<void> likeSong(String songId, String uid, List likes) async {
+    try {
+      if (likes.contains(uid)) {
+        await _firestore
+            .collection('Songs')
+            .doc(songId)
+            .update({
+          'likes': FieldValue.arrayRemove([uid]),
+        });
+      } else {
+        await _firestore
+            .collection('Songs')
+            .doc(songId)
+            .update({
+          'likes': FieldValue.arrayUnion([uid]),
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+
 
 
 }
