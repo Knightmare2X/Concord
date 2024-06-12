@@ -345,7 +345,8 @@ class FirestoreMethods {
         datePublished: DateTime.now(),
         songId: songId,
         likes: [],
-        views: [],
+        listens: [],
+        totalListens: [],
       );
 
       _firestore.collection('Songs').doc(songId).set(newSong.toJson());
@@ -357,29 +358,65 @@ class FirestoreMethods {
   }
 
   //like songs
-  Future<void> likeSong(String songId, String uid, List likes) async {
+  Future<List> likeSong(String songId, String uid, List likes) async {
     try {
       if (likes.contains(uid)) {
-        await _firestore
-            .collection('Songs')
-            .doc(songId)
-            .update({
+        await _firestore.collection('Songs').doc(songId).update({
           'likes': FieldValue.arrayRemove([uid]),
         });
       } else {
-        await _firestore
-            .collection('Songs')
-            .doc(songId)
-            .update({
+        await _firestore.collection('Songs').doc(songId).update({
           'likes': FieldValue.arrayUnion([uid]),
         });
       }
+
+      // Get the updated likes list from Firestore
+      DocumentSnapshot snapshot = await _firestore.collection('Songs').doc(songId).get();
+      List updatedLikes = (snapshot.data() as Map<String, dynamic>)['likes'];
+      return updatedLikes;
     } catch (e) {
       print(e.toString());
+      return likes;
     }
   }
 
+  //song listens
 
+  Future<void> listenToSong(String songId, String uid) async {
+    try {
+      final now = DateTime.now();
+      final songRef = _firestore.collection('Songs').doc(songId);
+      final listenHistoryRef = songRef.collection('ListenHistory').doc(uid);
+      final listenHistorySnapshot = await listenHistoryRef.get();
 
+      if (listenHistorySnapshot.exists) {
+        final data = listenHistorySnapshot.data() as Map<String, dynamic>;
+        final listens = (data['listens'] as List<dynamic>)
+            .map((e) => (e as Timestamp).toDate())
+            .toList();
+        final recentListens = listens.where((date) =>
+            date.isAfter(now.subtract(Duration(hours: 24)))).toList();
 
+        if (recentListens.length < 4) {
+          recentListens.add(now);
+          await listenHistoryRef.set({'listens': recentListens.map((date) => Timestamp.fromDate(date)).toList()});
+        }
+      } else {
+        await listenHistoryRef.set({
+          'listens': [Timestamp.fromDate(now)],
+        });
+      }
+
+      // Update the song's listeners collection
+      final listenersRef = songRef.collection('Listeners').doc(uid);
+      await listenersRef.set({'lastListen': Timestamp.fromDate(now)});
+    } catch (e) {
+      print("Error in listenToSong: $e");
+    }
+  }
 }
+
+
+
+
+

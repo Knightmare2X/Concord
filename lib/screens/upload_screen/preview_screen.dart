@@ -103,7 +103,8 @@ class _PreviewScreenState extends State<PreviewScreen> {
       datePublished: DateTime.now(),
       songId: '',
       likes: '',
-      views: '',
+      listens: '',
+      totalListens: '',
     );
 
     String res = await FirestoreMethods().uploadSong(song, widget.imageBytes, widget.audioPath);

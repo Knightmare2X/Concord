@@ -145,11 +145,11 @@ class SongScreen extends StatelessWidget {
                                 },
                                 child: music[currentSongIndex].likes.contains(user.uid)
                                     ? const Icon(
-                                  Icons.favorite,
-                                  color: Colors.red,
+                                  Icons.favorite_border,
                                 )
                                     : const Icon(
-                                  Icons.favorite_border,
+                                  Icons.favorite,
+                                  color: Colors.red,
                                 ),
                               ),
                             ),
