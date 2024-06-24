@@ -16,195 +16,176 @@ class ExploreScreen extends StatefulWidget {
 class _ExploreScreenState extends State<ExploreScreen> {
   final User user = FirebaseAuth.instance.currentUser!;
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        physics: const ScrollPhysics(),
-        children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height / 9.5,
-            width: MediaQuery.of(context).size.width,
-          ),
-          SizedBox(
-            height: MediaQuery.of(context).size.height / 5,
-            width: MediaQuery.of(context).size.width,
-            child: Center(
-              child: Column(
-                children: [
-                  const Text(
-                    'Explore',
-                    style: TextStyle(
-                      fontSize: 52,
-                      fontFamily: 'Josefin',
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height / 9.5,
+              width: MediaQuery.of(context).size.width,
+            ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height / 5,
+              width: MediaQuery.of(context).size.width,
+              child: Center(
+                child: Column(
+                  children: [
+                    const Text(
+                      'Explore',
+                      style: TextStyle(
+                        fontSize: 52,
+                        fontFamily: 'Josefin',
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () => showModalBottomSheet(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 90, // Adjust the width of the SizedBox to control spacing
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).pop();
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const UploadImages()));
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.grey, // Outline color
+                    IconButton(
+                      onPressed: () => showModalBottomSheet(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 90, // Adjust the width of the SizedBox to control spacing
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const UploadImages()));
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.yellow, // Outline color
+                                      ),
+                                      borderRadius: BorderRadius.circular(10.0), // Rounded corners
                                     ),
-                                    borderRadius: BorderRadius.circular(10.0), // Rounded corners
-                                  ),
-                                  padding: const EdgeInsets.all(5.0), // Padding inside the container
-                                  height: 90, // Adjust the height to make it square
-                                  child: const Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.image, // Icon
-                                        size: 36.0, // Icon size
-                                      ),
-                                      SizedBox(height: 8.0), // Space between icon and text
-                                      Text(
-                                        'Images', // Text
-                                        style: TextStyle(
-                                          fontSize: 14.0, // Text size
-                                          fontWeight: FontWeight.bold, // Text bold
+                                    padding: const EdgeInsets.all(5.0), // Padding inside the container
+                                    height: 90, // Adjust the height to make it square
+                                    child: const Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.image, // Icon
+                                          size: 36.0, // Icon size
                                         ),
-                                      ),
-                                    ],
+                                        SizedBox(height: 8.0), // Space between icon and text
+                                        Text(
+                                          'Images', // Text
+                                          style: TextStyle(
+                                            fontSize: 14.0, // Text size
+                                            fontWeight: FontWeight.bold, // Text bold
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 16), // Space between the two containers
-                            SizedBox(
-                              width: 90, // Adjust the width of the SizedBox to control spacing
-                              child: GestureDetector(
-                                onTap: (){
-                                  Navigator.of(context).pop();
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const UploadSong()));
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.grey, // Outline color
+                              const SizedBox(width: 16), // Space between the two containers
+                              SizedBox(
+                                width: 90, // Adjust the width of the SizedBox to control spacing
+                                child: GestureDetector(
+                                  onTap: (){
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const UploadSong()));
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.green, // Outline color
+                                      ),
+                                      borderRadius: BorderRadius.circular(10.0), // Rounded corners
                                     ),
-                                    borderRadius: BorderRadius.circular(10.0), // Rounded corners
-                                  ),
-                                  padding: const EdgeInsets.all(5.0), // Padding inside the container
-                                  height: 90, // Adjust the height to make it square
-                                  child: const Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.music_note, // Icon
-                                        size: 36.0, // Icon size
-                                      ),
-                                      SizedBox(height: 8.0), // Space between icon and text
-                                      Text(
-                                        'Music', // Text
-                                        style: TextStyle(
-                                          fontSize: 14.0, // Text size
-                                          fontWeight: FontWeight.bold, // Text bold
+                                    padding: const EdgeInsets.all(5.0), // Padding inside the container
+                                    height: 90, // Adjust the height to make it square
+                                    child: const Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.music_note, // Icon
+                                          size: 36.0, // Icon size
                                         ),
-                                      ),
-                                    ],
+                                        SizedBox(height: 8.0), // Space between icon and text
+                                        Text(
+                                          'Music', // Text
+                                          style: TextStyle(
+                                            fontSize: 14.0, // Text size
+                                            fontWeight: FontWeight.bold, // Text bold
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        );
-
-                      },
+                            ],
+                          );
+                        },
+                      ),
+                      icon: const Icon(
+                        Icons.add_box_outlined,
+                        size: 35,
+                      ),
                     ),
-                    icon: const Icon(
-                      Icons.add_box_outlined,
-                      size: 35,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('Posts')
-                .orderBy('datePublished', descending: true)
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-              return Expanded(
-                child: StreamBuilder<QuerySnapshot>(
+            StreamBuilder<DocumentSnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('Users')
+                  .doc(user.uid)
+                  .snapshots(),
+              builder: (context, userSnapshot) {
+                if (userSnapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                if (!userSnapshot.hasData) {
+                  return const Center(
+                    child: Text("No data available"),
+                  );
+                }
+                final List<dynamic> following = userSnapshot.data!['following'];
+                return StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('Posts')
                       .orderBy('datePublished', descending: true)
                       .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
+                  builder: (context, postSnapshot) {
+                    if (postSnapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
                         child: CircularProgressIndicator(),
                       );
                     }
-                    final List<QueryDocumentSnapshot> docs =
-                        snapshot.data!.docs;
-                    return Expanded(
-                      child: StreamBuilder<DocumentSnapshot>(
-                        stream: FirebaseFirestore.instance
-                            .collection('Users')
-                            .doc(user
-                                .uid) // Assuming currentUserUid is the UID of the current user
-                            .snapshots(),
-                        builder: (context, userSnapshot) {
-                          if (userSnapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                          final List<dynamic> following =
-                              userSnapshot.data!['following'];
-                          final filteredDocs = docs
-                              .where((doc) =>
-                                  following.contains(doc['uid']) ||
-                                  doc['uid'] == user.uid)
-                              .toList();
-                          return MasonryGridView.count(
-                            shrinkWrap: true,
-                            itemCount: filteredDocs.length,
-                            physics: const ScrollPhysics(),
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 30, horizontal: 10),
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 8,
-                            crossAxisSpacing: 8,
-                            itemBuilder: (context, index) => ImageCard(
-                              snap: filteredDocs[index].data(),
-                            ),
-                          );
-                        },
+                    if (!postSnapshot.hasData) {
+                      return const Center(
+                        child: Text("No posts available"),
+                      );
+                    }
+                    final List<QueryDocumentSnapshot> docs = postSnapshot.data!.docs;
+                    final filteredDocs = docs.where((doc) => following.contains(doc['uid']) || doc['uid'] == user.uid).toList();
+                    return MasonryGridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(), // Disable GridView's own scrolling
+                      itemCount: filteredDocs.length,
+                      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 8,
+                      itemBuilder: (context, index) => ImageCard(
+                        snap: filteredDocs[index].data() as Map<String, dynamic>,
                       ),
                     );
                   },
-                ),
-              );
-            },
-          ),
-        ],
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
-
-
 }

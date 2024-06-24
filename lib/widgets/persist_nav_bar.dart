@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:concord/screens/music_screen/song_screen.dart';
+import 'package:concord/screens/music_screen/music_screen.dart';
 import 'package:concord/screens/notifications_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +43,7 @@ class _PersistNavBarState extends State<PersistNavBar> {
           screens: [
             const ExploreScreen(),
             const SearchScreen(),
-            const SongScreen(),
+            const MusicScreen(),
             const NotificationsScreen(),
             ProfileScreen(
               uid: FirebaseAuth.instance.currentUser!.uid,

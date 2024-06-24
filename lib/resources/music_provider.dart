@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../model/song.dart';
 import '../resources/firestore.dart';
 
-class MusicProvider extends ChangeNotifier {
+class MusicProvider extends ChangeNotifier with WidgetsBindingObserver {
   List<Song> _songs = [];
   int? _currentSongIndex;
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -13,10 +13,30 @@ class MusicProvider extends ChangeNotifier {
   Duration _totalDuration = Duration.zero;
   bool _isPlaying = false;
   bool _isLoading = true;
+  bool _wasPlayingBeforePause = false;
 
   MusicProvider() {
     fetchSongs();
     listenToDuration();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      _wasPlayingBeforePause = _isPlaying;
+      pause();
+    } else if (state == AppLifecycleState.resumed && _wasPlayingBeforePause) {
+      _wasPlayingBeforePause = false; // Prevent automatic resume
+    }
+    super.didChangeAppLifecycleState(state);
   }
 
   Future<void> fetchSongs() async {
@@ -59,9 +79,11 @@ class MusicProvider extends ChangeNotifier {
   }
 
   void resume() async {
-    await _audioPlayer.resume();
-    _isPlaying = true;
-    notifyListeners();
+    if (!_isPlaying) { // Add check to prevent unintended resume
+      await _audioPlayer.resume();
+      _isPlaying = true;
+      notifyListeners();
+    }
   }
 
   void pauseOrResume() async {
@@ -70,7 +92,6 @@ class MusicProvider extends ChangeNotifier {
     } else {
       resume();
     }
-    notifyListeners();
   }
 
   void seek(Duration position) async {
