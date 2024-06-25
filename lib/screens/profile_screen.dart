@@ -143,8 +143,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 context: context,
                                 shape: const RoundedRectangleBorder(
                                   borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(10),
-                                    topRight: Radius.circular(10),
+                                    topLeft: Radius.circular(15),
+                                    topRight: Radius.circular(15),
                                   ),
                                 ),
                                 builder: (BuildContext context) {

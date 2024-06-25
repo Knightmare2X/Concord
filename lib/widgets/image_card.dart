@@ -22,10 +22,18 @@ class _ImageCardState extends State<ImageCard> {
   @override
   Widget build(BuildContext context) {
     final User user = FirebaseAuth.instance.currentUser!;
+    bool isPostOwner = widget.snap['uid'] == user.uid; // Check if the current user is the owner of the post
+
     return GestureDetector(
       onLongPress: () {
         showModalBottomSheet(
             context: context,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(15),
+                topRight: Radius.circular(15),
+              ),
+            ),
             builder: (BuildContext context) {
               return SizedBox(
                 height: 200,
@@ -34,7 +42,8 @@ class _ImageCardState extends State<ImageCard> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      ElevatedButton(
+                      isPostOwner
+                          ? ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
                           minimumSize: const Size.fromHeight(50), // NEW
@@ -45,7 +54,21 @@ class _ImageCardState extends State<ImageCard> {
                               color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                         onPressed: () async {
-                          FirestoreMethods().deletePost(widget.snap['postId']);
+                          await FirestoreMethods().deletePost(widget.snap['postId']);
+                          Navigator.of(context).pop();
+                        },
+                      )
+                          : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey,
+                          minimumSize: const Size.fromHeight(50), // NEW
+                        ),
+                        child: const Text(
+                          'Cannot delete this post',
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                        onPressed: () {
                           Navigator.of(context).pop();
                         },
                       ),
@@ -122,9 +145,9 @@ class _ImageCardState extends State<ImageCard> {
                       backgroundImage: imageProvider,
                     ),
                     placeholder: (context, url) =>
-                        const CircularProgressIndicator(),
+                    const CircularProgressIndicator(),
                     errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
+                    const Icon(Icons.error),
                   ),
                   Expanded(
                     child: Padding(
@@ -156,14 +179,14 @@ class _ImageCardState extends State<ImageCard> {
                       ),
                       child: widget.snap['likes'].contains(user.uid)
                           ? const Icon(
-                              Icons.favorite,
-                              size: 16,
-                              color: Colors.red,
-                            )
+                        Icons.favorite,
+                        size: 16,
+                        color: Colors.red,
+                      )
                           : const Icon(
-                              Icons.favorite_border,
-                              size: 16,
-                            ),
+                        Icons.favorite_border,
+                        size: 16,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 3),

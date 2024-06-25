@@ -195,15 +195,36 @@ class FirestoreMethods {
 
 //Deleting Post
   Future<String> deletePost(String postId) async {
-    String res = "some error occurred";
+    String res = "Some error occurred";
     try {
-      await _firestore.collection('Posts').doc(postId).delete();
-      res = 'success';
+      // Get the UID of the current user
+      String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
+      // Fetch the post data
+      DocumentSnapshot postSnapshot = await _firestore.collection('Posts').doc(postId).get();
+
+      if (postSnapshot.exists) {
+        // Get the UID of the post's creator
+        String postOwnerId = (postSnapshot.data() as Map<String, dynamic>)['uid'];
+
+        // Check if the current user is the creator of the post
+        if (postOwnerId == currentUserId) {
+          // Delete the post
+          await _firestore.collection('Posts').doc(postId).delete();
+          res = 'success';
+        } else {
+          res = 'You can only delete your own posts';
+        }
+      } else {
+        res = 'Post not found';
+      }
     } catch (err) {
       print(err.toString());
+      res = err.toString();
     }
     return res;
   }
+
 
 // Future<void> postComment(String postId, String text, String uid, String displayName, String profImage) async{
 //
