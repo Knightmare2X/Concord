@@ -4,6 +4,7 @@ import 'package:concord/screens/explore_screen/post_box.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'like_animation.dart';
 
@@ -42,7 +43,43 @@ class _ImageCardState extends State<ImageCard> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          minimumSize: const Size.fromHeight(50),
+                        ),
+                        child: const Text(
+                          'Share Post',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onPressed: () {
+                          Share.share('hi');
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          minimumSize: const Size.fromHeight(50),
+                        ),
+                        child: const Text(
+                          'View Profile',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onPressed: () {
+                          // Handle edit post logic
+                          Navigator.of(context).pop();
+                        },
+                      ),
+
                       isPostOwner
+                      //Delete post
                           ? ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
@@ -58,13 +95,16 @@ class _ImageCardState extends State<ImageCard> {
                           Navigator.of(context).pop();
                         },
                       )
+
+                      //Dislike post
+
                           : ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.grey,
                           minimumSize: const Size.fromHeight(50), // NEW
                         ),
                         child: const Text(
-                          'Cannot delete this post',
+                          'Dislike post',
                           style: TextStyle(
                               color: Colors.white, fontWeight: FontWeight.bold),
                         ),
@@ -72,6 +112,7 @@ class _ImageCardState extends State<ImageCard> {
                           Navigator.of(context).pop();
                         },
                       ),
+
                     ],
                   ),
                 ),

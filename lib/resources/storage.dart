@@ -28,7 +28,7 @@ class StorageMethods {
     return downloadUrl;
   }
   Future<String> uploadFileToStorage(String childName, String filePath) async {
-    Reference ref = _storage.ref().child(childName).child(Uuid().v1());
+    Reference ref = _storage.ref().child(childName).child(const Uuid().v1());
 
     UploadTask uploadTask = ref.putFile(File(filePath));
     TaskSnapshot snap = await uploadTask;

@@ -3,7 +3,7 @@ import 'package:concord/screens/music_screen/music_screen.dart';
 import 'package:concord/screens/notifications_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 import '../screens/explore_screen/explore_screen.dart';
 import '../screens/profile_screen.dart';
@@ -38,8 +38,6 @@ class _PersistNavBarState extends State<PersistNavBar> {
           handleAndroidBackButtonPress: true,
           resizeToAvoidBottomInset: true,
           stateManagement: true,
-          hideNavigationBarWhenKeyboardShows: true,
-          hideNavigationBar: hideNavBar,
           screens: [
             const ExploreScreen(),
             const SearchScreen(),

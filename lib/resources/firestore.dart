@@ -320,7 +320,7 @@ class FirestoreMethods {
           .update({'username': username});
     } catch (e) {
       print(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -416,7 +416,7 @@ class FirestoreMethods {
             .map((e) => (e as Timestamp).toDate())
             .toList();
         final recentListens = listens.where((date) =>
-            date.isAfter(now.subtract(Duration(hours: 24)))).toList();
+            date.isAfter(now.subtract(const Duration(hours: 24)))).toList();
 
         if (recentListens.length < 4) {
           recentListens.add(now);

@@ -52,7 +52,7 @@ class _UploadSongState extends State<UploadSong> {
         } else {
           // Show an error if the audio file is too long
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Audio file is longer than 1 minute 45 seconds')),
+            const SnackBar(content: Text('Audio file is longer than 1 minute 45 seconds')),
           );
         }
       }
@@ -80,7 +80,7 @@ class _UploadSongState extends State<UploadSong> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please select both an image and an audio file')),
+        const SnackBar(content: Text('Please select both an image and an audio file')),
       );
     }
   }
@@ -115,7 +115,7 @@ class _UploadSongState extends State<UploadSong> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: selectedImageBytes == null
-                          ? Center(
+                          ? const Center(
                         child: Text(
                           'Upload Albumart',
                           style: TextStyle(
@@ -136,11 +136,11 @@ class _UploadSongState extends State<UploadSong> {
                       ),
                     ),
                     if (selectedImageBytes == null && selectedImagePath != null)
-                      CircularProgressIndicator(),
+                      const CircularProgressIndicator(),
                   ],
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Container(
                 width: MediaQuery.of(context).size.width * 0.9,
                 decoration: BoxDecoration(
@@ -156,32 +156,32 @@ class _UploadSongState extends State<UploadSong> {
                     selectedAudioPath == null
                         ? 'Upload Master file'
                         : 'Audio Selected: ${selectedAudioPath!.split('/').last}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 20,
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 10),
-          Container(
+              const SizedBox(height: 10),
+          SizedBox(
             width: MediaQuery.of(context).size.width * 0.9,
-            child: Text(
+            child: const Text(
               'Note: The song duration must not be greater than 1 minute 45 seconds',
               style: TextStyle(
                 color: Colors.grey,
                 fontSize: 14,
               )),
           ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _buildTextField('Song Name', songNameController),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _buildTextField('Performed by', performedByController),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _buildTextField('Written by', writtenByController),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _buildTextField('Produced by', producedByController),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Container(
                 width: MediaQuery.of(context).size.width * 0.9,
                 decoration: BoxDecoration(
@@ -212,7 +212,7 @@ class _UploadSongState extends State<UploadSong> {
   Widget _buildTextField(String hint, TextEditingController controller) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.9,
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         border: Border.all(
           color: Colors.white,
@@ -222,10 +222,10 @@ class _UploadSongState extends State<UploadSong> {
       ),
       child: TextField(
         controller: controller,
-        style: TextStyle(color: Colors.white, fontSize: 20),
+        style: const TextStyle(color: Colors.white, fontSize: 20),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: Colors.white54),
+          hintStyle: const TextStyle(color: Colors.white54),
           border: InputBorder.none,
         ),
       ),

@@ -26,7 +26,7 @@ class SongScreen extends StatelessWidget {
     return Consumer<MusicProvider>(builder: (context, value, child) {
       // Check if loading
       if (value.isLoading) {
-        return Scaffold(
+        return const Scaffold(
           backgroundColor: Colors.black,
           body: Center(
             child: CircularProgressIndicator(), // Or any other placeholder widget
@@ -40,7 +40,7 @@ class SongScreen extends StatelessWidget {
       // Check if music list is empty
       if (music.isEmpty) {
         // Handle the case where music list is empty
-        return Scaffold(
+        return const Scaffold(
           backgroundColor: Colors.black,
           body: Center(
             child: Text(
@@ -95,10 +95,10 @@ class SongScreen extends StatelessWidget {
                           width: MediaQuery.of(context).size.width * 0.9,
                           height: MediaQuery.of(context).size.width * 0.9,
                           fit: BoxFit.cover,
-                          placeholder: (context, url) => Center(
+                          placeholder: (context, url) => const Center(
                             child: CircularProgressIndicator(),
                           ),
-                          errorWidget: (context, url, error) => Icon(Icons.error),
+                          errorWidget: (context, url, error) => const Icon(Icons.error),
                         ),
                       ),
                       Padding(

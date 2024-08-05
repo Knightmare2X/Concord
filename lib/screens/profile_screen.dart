@@ -69,7 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: isLoading
-          ? Center(
+          ? const Center(
         child: CircularProgressIndicator(),
       )
           : SingleChildScrollView(
@@ -81,12 +81,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
+                return const Center(
                   child: CircularProgressIndicator(),
                 );
               }
               if (!snapshot.hasData || snapshot.data == null) {
-                return Center(
+                return const Center(
                   child: Text(
                     'No data available',
                     style: TextStyle(
@@ -374,14 +374,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return Center(
+                          return const Center(
                             child: CircularProgressIndicator(),
                           );
                         }
                         if (!snapshot.hasData ||
                             snapshot.data == null ||
                             snapshot.data!.docs.isEmpty) {
-                          return Center(
+                          return const Center(
                             child: Text(
                               'No posts',
                               style: TextStyle(

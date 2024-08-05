@@ -13,69 +13,89 @@ final GoogleSignIn _googleSignIn = GoogleSignIn();
 
 Future<void> signUp(BuildContext context) async {
   try {
-    // Sign in with Google
-    GoogleSignInAccount? googleSignInAccount =
-        await _googleSignIn.signInSilently();
-    googleSignInAccount ??= await _googleSignIn.signIn();
+    GoogleSignInAccount? googleSignInAccount;
+
+    try {
+      // Attempt to sign in silently
+      print("Attempting silent sign-in...");
+      googleSignInAccount = await _googleSignIn.signInSilently();
+      print("Silent sign-in successful: ${googleSignInAccount?.email}");
+    } catch (e) {
+      print("Silent sign-in failed: $e");
+    }
+
+    // If silent sign-in fails, proceed with manual sign-in
+    if (googleSignInAccount == null) {
+      print("Attempting manual Google sign-in...");
+      googleSignInAccount = await _googleSignIn.signIn();
+      print("Manual Google sign-in successful: ${googleSignInAccount?.email}");
+    }
+
     if (googleSignInAccount != null) {
-      GoogleSignInAuthentication googleAuth =
-          await googleSignInAccount.authentication;
+      print("Fetching Google authentication credentials...");
+      GoogleSignInAuthentication googleAuth = await googleSignInAccount.authentication;
+      print("Access token: ${googleAuth.accessToken}");
+      print("ID token: ${googleAuth.idToken}");
+
       AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
+
+      print("Signing in with Firebase using Google credentials...");
+      UserCredential userCredential = await _auth.signInWithCredential(credential);
       User? user = userCredential.user;
 
       if (user != null) {
-        // Check if the user document exists in Firestore
-        DocumentSnapshot userDoc =
-            await _firestore.collection('Users').doc(user.uid).get();
+        print("User signed in: ${user.email}");
 
-        if (userDoc.exists) {
-          // If user document exists, check if username is present
-          if (userDoc.get('username') != null) {
-            if (context.mounted) {
-              // If username exists, navigate to home screen
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const PersistNavBar()));
-            }
-            return;
+        print("Checking if user document exists in Firestore...");
+        DocumentSnapshot userDoc = await _firestore.collection('Users').doc(user.uid).get();
+        print("User document exists: ${userDoc.exists}");
+
+        if (userDoc.exists && userDoc.get('username') != null) {
+          print("Username found in Firestore. Navigating to PersistNavBar...");
+          if (context.mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const PersistNavBar()),
+            );
+          }
+        } else {
+          print("Username not found. Creating user document in Firestore...");
+          await _firestore.collection('Users').doc(user.uid).set({
+            'email': user.email,
+            'uid': user.uid,
+            'followers': [],
+            'following': [],
+            'totalViews': 0,
+            'creationDate': DateTime.now(),
+          });
+          print("User document created. Navigating to CreateDescPicScreen...");
+          if (context.mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const CreateDescPicScreen()),
+            );
           }
         }
-
-        // If user document doesn't exist or username is not present, proceed with creating user document
-        await _firestore.collection('Users').doc(user.uid).set({
-          'email': user.email,
-          'uid': user.uid,
-          'followers': [],
-          'following': [],
-          'totalViews': 0,
-          'creationDate': DateTime.now(),
-        });
-        // Navigate to create description and picture screen
-        if (context.mounted) {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const CreateDescPicScreen()));
-        }
+      } else {
+        print("Firebase sign-in failed. User is null.");
       }
+    } else {
+      throw Exception("Google Sign-In failed. googleSignInAccount is null.");
     }
   } catch (error) {
-    print(error);
+    print("Sign-in error: $error");
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Sign in failed'),
-        ),
+        const SnackBar(content: Text('Sign in failed')),
       );
     }
   }
 }
+
+
 
 Future<void> signOut(BuildContext context) async {
   try {

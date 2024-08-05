@@ -113,10 +113,10 @@ class _PreviewScreenState extends State<PreviewScreen> {
     });
 
     if (res == 'success') {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Song uploaded successfully')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Song uploaded successfully')));
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => MusicScreen()),
+        MaterialPageRoute(builder: (context) => const MusicScreen()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res)));
