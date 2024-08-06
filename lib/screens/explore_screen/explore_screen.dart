@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:concord/screens/gemini_screen/imagen_screen.dart';
 import 'package:concord/widgets/image_card.dart';
-import 'package:concord/screens/upload_screen/upload_song.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -88,27 +88,28 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                 child: GestureDetector(
                                   onTap: (){
                                     Navigator.of(context).pop();
-                                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const UploadSong()));
+                                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ImagenScreen()));
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
                                       border: Border.all(
-                                        color: Colors.green, // Outline color
+                                        color: Colors.blue, // Outline color
                                       ),
                                       borderRadius: BorderRadius.circular(10.0), // Rounded corners
                                     ),
                                     padding: const EdgeInsets.all(5.0), // Padding inside the container
                                     height: 90, // Adjust the height to make it square
-                                    child: const Column(
+                                    child:  Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Icon(
-                                          Icons.music_note, // Icon
-                                          size: 36.0, // Icon size
+                                        Image.asset(
+                                          'assets/icons/icon_gemini.png',
+                                          height: 34,
+                                          width: 34,
                                         ),
                                         SizedBox(height: 8.0), // Space between icon and text
                                         Text(
-                                          'Music', // Text
+                                          'Imagen', // Text
                                           style: TextStyle(
                                             fontSize: 14.0, // Text size
                                             fontWeight: FontWeight.bold, // Text bold
