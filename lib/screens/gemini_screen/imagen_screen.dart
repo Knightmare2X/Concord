@@ -23,7 +23,7 @@ class _ImagenScreenState extends State<ImagenScreen> {
                 width: double.infinity,
                 height: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
-                  color: Colors.blue,
+                  color: Colors.lightBlueAccent,
                   borderRadius: BorderRadius.circular(16.0),
                 ),
               ),
