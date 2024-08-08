@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:concord/screens/gemini_screen/imagen_screen.dart';
 import 'package:concord/widgets/image_card.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -40,90 +39,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () => showModalBottomSheet(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                width: 90, // Adjust the width of the SizedBox to control spacing
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.of(context).pop();
-                                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const UploadImages()));
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.yellow, // Outline color
-                                      ),
-                                      borderRadius: BorderRadius.circular(10.0), // Rounded corners
-                                    ),
-                                    padding: const EdgeInsets.all(5.0), // Padding inside the container
-                                    height: 90, // Adjust the height to make it square
-                                    child: const Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.image, // Icon
-                                          size: 36.0, // Icon size
-                                        ),
-                                        SizedBox(height: 8.0), // Space between icon and text
-                                        Text(
-                                          'Images', // Text
-                                          style: TextStyle(
-                                            fontSize: 14.0, // Text size
-                                            fontWeight: FontWeight.bold, // Text bold
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 16), // Space between the two containers
-                              SizedBox(
-                                width: 90, // Adjust the width of the SizedBox to control spacing
-                                child: GestureDetector(
-                                  onTap: (){
-                                    Navigator.of(context).pop();
-                                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ImagenScreen()));
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.blue, // Outline color
-                                      ),
-                                      borderRadius: BorderRadius.circular(10.0), // Rounded corners
-                                    ),
-                                    padding: const EdgeInsets.all(5.0), // Padding inside the container
-                                    height: 90, // Adjust the height to make it square
-                                    child:  Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Image.asset(
-                                          'assets/icons/icon_gemini.png',
-                                          height: 34,
-                                          width: 34,
-                                        ),
-                                        SizedBox(height: 8.0), // Space between icon and text
-                                        Text(
-                                          'Imagen', // Text
-                                          style: TextStyle(
-                                            fontSize: 14.0, // Text size
-                                            fontWeight: FontWeight.bold, // Text bold
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
+                      onPressed: () {
+                          Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                  const UploadImages()),
+                                (Route<dynamic> route) => route.isFirst,);
+
+                      },
                       icon: const Icon(
                         Icons.add_box_outlined,
                         size: 35,
@@ -156,7 +79,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       .orderBy('datePublished', descending: true)
                       .snapshots(),
                   builder: (context, postSnapshot) {
-                    if (postSnapshot.connectionState == ConnectionState.waiting) {
+                    if (postSnapshot.connectionState ==
+                        ConnectionState.waiting) {
                       return const Center(
                         child: CircularProgressIndicator(),
                       );
@@ -166,18 +90,26 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         child: Text("No posts available"),
                       );
                     }
-                    final List<QueryDocumentSnapshot> docs = postSnapshot.data!.docs;
-                    final filteredDocs = docs.where((doc) => following.contains(doc['uid']) || doc['uid'] == user.uid).toList();
+                    final List<QueryDocumentSnapshot> docs =
+                        postSnapshot.data!.docs;
+                    final filteredDocs = docs
+                        .where((doc) =>
+                            following.contains(doc['uid']) ||
+                            doc['uid'] == user.uid)
+                        .toList();
                     return MasonryGridView.count(
                       shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(), // Disable GridView's own scrolling
+                      physics:
+                          const NeverScrollableScrollPhysics(), // Disable GridView's own scrolling
                       itemCount: filteredDocs.length,
-                      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 30, horizontal: 10),
                       crossAxisCount: 2,
                       mainAxisSpacing: 8,
                       crossAxisSpacing: 8,
                       itemBuilder: (context, index) => ImageCard(
-                        snap: filteredDocs[index].data() as Map<String, dynamic>,
+                        snap:
+                            filteredDocs[index].data() as Map<String, dynamic>,
                       ),
                     );
                   },

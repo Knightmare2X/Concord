@@ -83,5 +83,3 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(
       systemNavigationBarColor: Colors.black)); //delete for light mode
 }
-
-
